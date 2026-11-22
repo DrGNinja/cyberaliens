@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cyb3rALIENS · Operations</title>
+<title>Cyb3rALIENS · The system</title>
 <style>
   :root { color-scheme: dark; --bg:#07110e; --surface:#101916; --surface-2:#18241f; --fg:#e7f0ea; --muted:#8ea399; --line:#24332c; --signal:#3ddc97; --signal-dim:#14382a; --alert:#e2b340; --alert-dim:#3a3014; }
   * { box-sizing: border-box; }
@@ -48,8 +48,8 @@
 <header>
   <div>
     <p class="kicker">U.S. PATENT 10,673,617 B1</p>
-    <h1>Operations</h1>
-    <p class="muted" style="margin:0;max-width:40rem">One system, from the two chips up to the channel. The dashboard fills in order. Nothing above a failed step is allowed to light.</p>
+    <h1>The system</h1>
+    <p class="muted" style="margin:0;max-width:40rem">Watch one network. A step lights only after it happens. A device earns a name only after it earns it.</p>
   </div>
   <div class="row">
     <a href="index.html">All demonstrations</a>
@@ -61,45 +61,54 @@
 </header>
 <main>
   <p class="now"><span class="kicker" id="beat-name"></span><br><strong id="beat-plain"></strong><br><span class="muted" id="beat-copy"></span></p>
-  <div class="layout">
+  <section class="card" id="records">
+    <div class="layout">
+      <div>
+        <h2>Who is allowed to speak</h2>
+        <table id="iam"><thead><tr><th>Device</th><th>Identity</th><th>Decision</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div>
+        <h2>The record</h2>
+        <table id="ledger"><thead><tr><th>Block</th><th>What was written</th><th>Check</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+  <div class="layout" style="margin-top:12px">
     <section class="card">
-      <h2>Fleet</h2>
+      <h2>Devices</h2>
       <div class="fleet" id="fleet"></div>
       <div class="channel" id="channel"></div>
+      <p class="muted" style="font-size:12px;margin:8px 0 0">Each dot is one step. It lights only when that step has happened.</p>
       <div class="housings">
-        <span>Dock</span><span>PCI card</span><span>Adapter</span><span>Pulse-generator can</span><span>Voting terminal</span>
+        <span>Dock</span><span>Computer card</span><span>Adapter</span><span>Pulse-generator can</span><span>Voting terminal</span>
       </div>
-      <p class="muted" style="font-size:12px;margin:8px 0 0">Same two chips. Same method. The cars on this screen are the patent’s prover and verifier.</p>
+      <p class="muted" style="font-size:12px;margin:8px 0 0">The same two chips fit each of these. This run uses the cars and one dock.</p>
     </section>
     <section class="card">
       <h2 id="focus-name">Device</h2>
       <div class="stack" id="stack"></div>
-      <h2 style="margin-top:16px">IAM and the central server</h2>
-      <table id="iam"><thead><tr><th>Device</th><th>Identity</th><th>Decision</th></tr></thead><tbody></tbody></table>
-      <h2 style="margin-top:16px">Blockchain</h2>
-      <table id="ledger"><thead><tr><th>Block</th><th>Event</th><th>Proof</th></tr></thead><tbody></tbody></table>
     </section>
   </div>
 </main>
 <footer>Simulation of the published method for a meeting. Not a patent license and not the production chip. The zero-knowledge proof is shown as the patent describes it: the prover does not unveil the secret, and the verifier accepts or refuses the proof.</footer>
 <script>
 const layers = [
-  ["i2c", "I2C", "MC (A) master · MC (B) slave"],
-  ["c1", "Cipher 1", "Channel 1A and 1B · two 256-bit keys"],
-  ["c2", "Cipher 2", "Rounds of 10 · 512-bit validation key"],
-  ["pki", "PKI", "AES-2048 certificate"],
-  ["dna", "Digital DNA", "MAC · serial · fingerprint"],
-  ["db", "Central server", "Registered, or seen and not granted"],
-  ["chain", "Blockchain", "Block carries the previous hash"],
-  ["zkp", "Zero-knowledge proof", "Secret stays unveiled: no"],
-  ["p2pe", "P2PE", "Opens only after the record"]
+  ["i2c", "The two chips", "Connected. One leads, one answers."],
+  ["c1", "First key", "Two different halves, one from each chip."],
+  ["c2", "The 512-bit key", "The halves are mixed ten times."],
+  ["pki", "Certificate", "Issued so the key can be trusted."],
+  ["dna", "Fingerprint", "Network address, serial number, fingerprint."],
+  ["db", "Permission", "The server decides who may speak."],
+  ["chain", "Record", "This entry points to the one before it."],
+  ["zkp", "Proof", "The secret is not shown."],
+  ["p2pe", "Private message", "Allowed only after the record."]
 ];
 const blank = () => Object.fromEntries(layers.map(([id]) => [id, "off"]));
 const devices = {
-  a: { name: "Vehicle A", role: "Prover", note: "Carries the chip", stage: blank() },
-  b: { name: "Vehicle B", role: "Verifier", note: "Carries the chip", stage: blank() },
-  c: { name: "Vehicle C", role: "Outside", note: "No record", stage: blank() },
-  d: { name: "Unit D", role: "Unfinished", note: "Dock", stage: blank() }
+  a: { name: "Vehicle A", role: "Car", note: "On the network", stage: blank() },
+  b: { name: "Vehicle B", role: "Car", note: "On the network", stage: blank() },
+  c: { name: "Vehicle C", role: "Car", note: "On the network", stage: blank() },
+  d: { name: "Unit D", role: "Dock", note: "On the network", stage: blank() }
 };
 let focus = "a";
 let beat = 0;
@@ -115,13 +124,13 @@ const beats = [
   { name: "Cipher 1", plain: "Each chip prepares its own half of the key. The halves are not the same.", ms: 7000, focus: "a", copy: "Channel 1A and channel 1B each carry a different AES-SEA 256-bit key. The timer feeds the clock.", run() { light("a", "c1", "on"); } },
   { name: "Cipher 2", plain: "The two halves are mixed ten times. Now there is one key.", ms: 7000, focus: "a", copy: "Ten rounds. The AES-SEA 512-bit validation key now exists.", run() { light("a", "c2", "on"); } },
   { name: "Certificate", plain: "A certificate is issued so later steps can trust this key.", ms: 5500, focus: "a", copy: "The 512-bit key is sent to the PKI server. AES-2048 places the certificate.", run() { light("a", "pki", "on"); } },
-  { name: "Identity", plain: "The car gets an identity: a network address, a serial number, and a fingerprint.", ms: 7000, focus: "a", copy: "IAM collects the MAC address, the serial number, and the fingerprint. The central server marks Vehicle A registered.", run() { light("a", "dna", "on"); light("a", "db", "on"); } },
+  { name: "Identity", plain: "The car gets an identity: a network address, a serial number, and a fingerprint.", ms: 7000, focus: "a", copy: "IAM collects the MAC address, the serial number, and the fingerprint. The central server marks Vehicle A registered.", run() { light("a", "dna", "on"); light("a", "db", "on"); devices.a.role = "Registered"; devices.a.note = "Identity on file"; } },
   { name: "Ledger", plain: "That identity is written down in a record that points back to the one before it.", ms: 6000, focus: "a", copy: "A block is written. It carries the hash of the previous block. A DApp channel links IAM to the ledger.", run() { light("a", "chain", "on"); } },
-  { name: "Second device", plain: "The second car does the same thing. It is now able to check the first.", ms: 7000, focus: "b", copy: "Vehicle B completes the same stack. Same chips. Same method. It can now verify.", run() { ["i2c","c1","c2","pki","dna","db","chain"].forEach(k => light("b", k, "on")); } },
-  { name: "Zero-knowledge proof", plain: "The first car proves it holds the secret without showing the secret.", ms: 8000, focus: "a", copy: "Vehicle A is the prover. Vehicle B is the verifier. The secret is not unveiled. The proof is accepted.", run() { light("a", "zkp", "on"); light("b", "zkp", "on"); } },
-  { name: "P2PE", plain: "Only now are the two cars allowed to exchange one private message.", ms: 7000, focus: "a", copy: "Both devices have a record. One packet crosses on the 512-bit key.", run() { light("a", "p2pe", "on"); light("b", "p2pe", "on"); } },
-  { name: "Refused", plain: "A third car is visible. It has no identity, so it is not allowed to speak.", ms: 7000, focus: "c", copy: "Vehicle C is seen by the central server. It has no record. The channel is refused. A firewall did not make this decision.", run() { light("c", "db", "stop"); } },
-  { name: "Unfinished", plain: "If the chips do not finish talking, the key is never made and nothing after it happens.", ms: 8000, focus: "d", copy: "Unit D, on a dock. Channel 1B does not return. TXCOMP is not set. Cipher 2 does not run. No key, no identity, no block, no channel.", run() { light("d", "i2c", "on"); light("d", "c1", "stop"); } }
+  { name: "Second device", plain: "The second car does the same thing. It is now able to check the first.", ms: 7000, focus: "b", copy: "Vehicle B completes the same stack. Same chips. Same method. It can now verify.", run() { ["i2c","c1","c2","pki","dna","db","chain"].forEach(k => light("b", k, "on")); devices.b.role = "Registered"; devices.b.note = "Identity on file"; } },
+  { name: "Zero-knowledge proof", plain: "The first car proves it holds the secret without showing the secret.", ms: 8000, focus: "a", copy: "Vehicle A is the prover. Vehicle B is the verifier. The secret is not unveiled. The proof is accepted.", run() { light("a", "zkp", "on"); light("b", "zkp", "on"); devices.a.role = "Proves"; devices.b.role = "Checks"; } },
+  { name: "P2PE", plain: "Only now are the two cars allowed to exchange one private message.", ms: 7000, focus: "a", copy: "Both devices have a record. One packet crosses on the 512-bit key.", run() { light("a", "p2pe", "on"); light("b", "p2pe", "on"); devices.a.note = "Speaking"; devices.b.note = "Speaking"; } },
+  { name: "Refused", plain: "A third car is visible. It has no identity, so it is not allowed to speak.", ms: 7000, focus: "c", copy: "Vehicle C is seen by the central server. It has no record. The channel is refused. A firewall did not make this decision.", run() { light("c", "db", "stop"); devices.c.role = "Refused"; devices.c.note = "No identity on file"; } },
+  { name: "Unfinished", plain: "If the chips do not finish talking, the key is never made and nothing after it happens.", ms: 8000, focus: "d", copy: "Unit D, on a dock. Channel 1B does not return. TXCOMP is not set. Cipher 2 does not run. No key, no identity, no block, no channel.", run() { light("d", "i2c", "on"); light("d", "c1", "stop"); devices.d.role = "Stopped"; devices.d.note = "The chips did not finish"; } }
 ];
 
 let painted = "";
@@ -144,28 +153,40 @@ function render() {
   const device = devices[focus];
   document.getElementById("focus-name").textContent = device.name + " · " + device.role;
   document.getElementById("stack").innerHTML = layers.map(([key, title, detail]) =>
-    '<div class="step ' + device.stage[key] + '"><span>' + title + '</span><span class="muted">' + (device.stage[key] === "off" ? "Dark" : device.stage[key] === "stop" ? "Stopped" : detail) + '</span></div>'
+    '<div class="step ' + device.stage[key] + '"><span>' + title + '</span><span class="muted">' + (device.stage[key] === "off" ? "Not yet" : device.stage[key] === "stop" ? "Stopped" : detail) + '</span></div>'
   ).join("");
   const iam = [];
-  if (devices.a.stage.db === "on") iam.push(["Vehicle A", "MAC · serial · fingerprint", "Registered"]);
-  if (devices.b.stage.db === "on") iam.push(["Vehicle B", "MAC · serial · fingerprint", "Registered"]);
-  if (devices.c.stage.db === "stop") iam.push(["Vehicle C", "Seen, no fingerprint record", "Not granted"]);
+  if (devices.a.stage.db === "on") iam.push(["Vehicle A", "A4:19:C0:11:7E:02 · CYB-A-1044 · 7F3A…C91E", "May speak"]);
+  if (devices.b.stage.db === "on") iam.push(["Vehicle B", "B8:22:11:90:04:C3 · CYB-B-2281 · 91D0…44AA", "May speak"]);
+  if (devices.c.stage.db === "stop") iam.push(["Vehicle C", "Seen. No fingerprint on file.", "May not speak"]);
   document.querySelector("#iam tbody").innerHTML = iam.map(row => "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td></tr>").join("") || "<tr><td colspan='3' class='muted'>No identity yet</td></tr>";
   const ledger = [];
-  if (devices.a.stage.chain === "on") ledger.push(["1", "REGISTER Vehicle A", "Previous hash carried"]);
-  if (devices.b.stage.chain === "on") ledger.push(["2", "REGISTER Vehicle B", "Linked to block 1"]);
-  if (devices.a.stage.zkp === "on") ledger.push(["Proof", "A proves to B", "Secret not unveiled"]);
-  if (devices.a.stage.p2pe === "on") ledger.push(["Channel", "A to B", "P2PE open"]);
+  if (devices.a.stage.chain === "on") ledger.push(["1", "Vehicle A registered", "Points to the start"]);
+  if (devices.b.stage.chain === "on") ledger.push(["2", "Vehicle B registered", "Points to block 1"]);
+  if (devices.a.stage.zkp === "on") ledger.push(["Proof", "A proves to B", "Secret not shown"]);
+  if (devices.a.stage.p2pe === "on") ledger.push(["Message", "Passing on your left.", "Read back intact"]);
   document.querySelector("#ledger tbody").innerHTML = ledger.map(row => "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td></tr>").join("") || "<tr><td colspan='3' class='muted'>No block yet</td></tr>";
   const channel = document.getElementById("channel");
-  if (devices.a.stage.p2pe === "on") channel.textContent = "Vehicle A  →  packet  →  Vehicle B    ·    Vehicle C refused    ·    Unit D stopped";
-  else if (devices.c.stage.db === "stop") channel.textContent = "No packet. Vehicle C has no record.";
-  else channel.textContent = "No packet is moving.";
+  const said = [];
+  if (devices.a.stage.p2pe === "on") said.push('Vehicle A sent "Passing on your left." Vehicle B read the same words back.');
+  if (devices.c.stage.db === "stop") said.push("Vehicle C asked to speak and was refused.");
+  if (devices.d.stage.c1 === "stop") said.push("Unit D stopped before a key existed.");
+  channel.textContent = said.join(" ") || "No message yet.";
 }
 
+const opening = {
+  a: ["Car", "On the network"],
+  b: ["Car", "On the network"],
+  c: ["Car", "On the network"],
+  d: ["Dock", "On the network"]
+};
+function restoreNames() {
+  Object.entries(opening).forEach(([id, pair]) => { devices[id].role = pair[0]; devices[id].note = pair[1]; });
+}
 function reset() {
   Object.values(devices).forEach(device => { device.stage = blank(); });
-  focus = "a"; beat = 0; local = 0; playing = true;
+  restoreNames();
+  focus = "a"; beat = 0; local = 0; playing = true; painted = "";
   beats[0].run();
   render();
 }
@@ -175,6 +196,7 @@ function go(next) {
   beat = next;
   local = 0;
   Object.values(devices).forEach(device => { device.stage = blank(); });
+  restoreNames();
   for (let i = 0; i <= beat; i++) beats[i].run();
   focus = beats[beat].focus;
   painted = "";
@@ -191,7 +213,7 @@ function tick(now) {
     if (local >= beats[beat].ms) {
       local = 0;
       beat = (beat + 1) % beats.length;
-      if (beat === 0) Object.values(devices).forEach(device => { device.stage = blank(); });
+      if (beat === 0) { Object.values(devices).forEach(device => { device.stage = blank(); }); restoreNames(); }
       beats[beat].run();
       focus = beats[beat].focus;
     }
