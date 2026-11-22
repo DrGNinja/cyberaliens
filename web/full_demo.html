@@ -91,7 +91,7 @@
         <button class="secondary" onclick="inject('revoke')">Inject Revoke Block</button>
       </div>
       <input type="text" id="msg" value="Secure investor demo payload" placeholder="Message">
-      <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--muted)">Run the registered device follows the C++ onboard path: both chips, the record, no message sent. The file uses the same fields as the C++ export. It is not a patent license and it is not the production chip.</p>
+      <div id="report" style="margin-top:0.8rem;white-space:pre-wrap;font:0.8rem/1.45 ui-monospace,monospace;color:var(--text)"></div>
     </div>
     <div class="card">
       <h3>Live Event Log</h3>
@@ -298,14 +298,6 @@ function selfTest() {
   log('Self-test '+(overall?'PASSED':'FAILED'), overall?'log-ok':'log-err');
 }
 
-function downloadJson(name, report) {
-  const blob = new Blob([JSON.stringify(report, null, 2)], { type:'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-}
-
 function runRegistered() {
   const before = state.iam.length;
   onboard();
@@ -313,56 +305,50 @@ function runRegistered() {
     log('Registered-device run stopped before a record was written', 'log-err');
     return;
   }
-  const active = state.iam.filter(d => d.status === 'active').length;
-  const revoked = state.iam.filter(d => d.status === 'revoked').length;
-  const now = Math.floor(Date.now() / 1000);
-  const report = {
-    notice: "Simulation of the registered-device run published in the C++ program (menu 1 and POST /api/onboard). Field names match GET /api/export. No P2PE payload was sent. This file is not a patent license and the key values are not production keys.",
-    patent: "US10673617B1",
-    run: "registered-device",
-    p2pe_opened: false,
-    status: {
-      iam_devices: state.iam.length,
-      active_devices: active,
-      revoked_devices: revoked,
-      fleet_pairs: state.fleet.length,
-      ledger_entries: state.ledger.length,
-      has_active_pair: state.activeIdx >= 0,
-      ledger_integrity: true
-    },
-    iam: {
-      devices: state.iam.map(d => ({
-        dna_short: d.short,
-        dna: d.dna,
-        status: d.status,
-        validation: d.validation,
-        mac: d.mac,
-        serial: d.serial,
-        firmware: d.firmware,
-        notes: d.notes,
-        last_tx: d.last_tx,
-        registered_ts: now
-      })),
-      count: state.iam.length
-    },
-    ledger: {
-      entries: state.ledger.slice(-20).map(e => ({
-        index: e.index,
-        event: e.event,
-        dna_a: e.dna_a,
-        dna_b: e.dna_b,
-        hash: e.hash,
-        ts: Math.floor((e.ts > 100000000000 ? e.ts / 1000 : e.ts))
-      })),
-      total: state.ledger.length,
-      integrity: true
-    },
-    trace: state.trace,
-    fleet_size: state.fleet.length,
-    exported_at: now
-  };
-  downloadJson('cyb3raliens_registered_device.json', report);
-  log('Registered-device report saved', 'log-ok');
+  const now = new Date();
+  const devices = state.iam.map((d, i) =>
+    [
+      'Device ' + (i + 1),
+      '  Status: ' + d.status,
+      '  Validation: ' + d.validation,
+      '  MAC address: ' + d.mac,
+      '  Serial number: ' + d.serial,
+      '  DNA identity: ' + d.dna,
+      '  Notes: ' + d.notes
+    ].join('\n')
+  ).join('\n\n');
+  const blocks = state.ledger.filter(e => e.event === 'REGISTER').map(e =>
+    '  Block ' + e.index + '  ' + e.event + '  hash ' + e.hash
+  ).join('\n');
+  const steps = state.trace.map(t => '  ' + t.seq + '. ' + t.stage + ' — ' + t.step).join('\n');
+  const text = [
+    'REGISTERED DEVICE',
+    'U.S. Patent 10,673,617 B1',
+    '',
+    'This is a simulation of the published method.',
+    'It is not a patent license and it is not the production chip.',
+    'No P2PE message was sent. The channel stays closed until a device has this record.',
+    '',
+    'Result',
+    '  Devices registered: ' + state.iam.length,
+    '  P2PE opened: no',
+    '  Ledger check: passed',
+    '',
+    'Identity record',
+    devices,
+    '',
+    'Ledger',
+    blocks || '  No registration block was written.',
+    '',
+    'Steps',
+    steps,
+    '',
+    'Run at: ' + now.toLocaleString()
+  ].join('\n');
+  const panel = document.getElementById('report');
+  panel.textContent = text;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  log('Registered-device record is on this page', 'log-ok');
 }
 
 function exportReport() {
