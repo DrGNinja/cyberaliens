@@ -75,7 +75,10 @@
     <div class="card">
       <h3>Control Plane</h3>
       <div class="actions">
-        <button class="success" onclick="runThree()">Run the three outcomes</button>
+        <button class="success" onclick="showRegistered()">Registered device</button>
+        <button class="success" onclick="showChannel()">Open the channel</button>
+        <button onclick="showRefused()">Refused device</button>
+        <button onclick="showUnfinished()">Unfinished transmission</button>
       </div>
       <div class="actions">
         <button class="success" onclick="onboard()">① Onboard Pair</button>
@@ -306,6 +309,100 @@ function deviceBlock(d, n) {
     '  Serial number: ' + d.serial,
     '  DNA identity: ' + d.dna
   ].join('\n');
+}
+
+function showReport(text) {
+  const panel = document.getElementById('report');
+  panel.textContent = text;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function fresh() {
+  state.fleet = [];
+  state.activeIdx = -1;
+  state.iam = [];
+  state.ledger = [{ index:0, event:'GENESIS', dna_a:'', dna_b:'', hash:'0000000000', ts:Date.now() }];
+  state.trace = [];
+  state.inject = { entropy:false, mismatch:false, revoke:false };
+}
+
+function showRegistered() {
+  fresh();
+  onboard();
+  if (!state.iam.length) {
+    log('Registration stopped before a record was written', 'log-err');
+    return;
+  }
+  const devices = state.iam.slice(0, 2).map((d, i) => deviceBlock(d, i + 1)).join('\n\n');
+  showReport([
+    'REGISTERED DEVICE',
+    'U.S. Patent 10,673,617 B1',
+    'A simulation of the published method. Not a patent license. Not the production chip.',
+    '',
+    devices,
+    '  Ledger: REGISTER written for both devices.',
+    '  P2PE opened: no',
+    '  The channel stays closed until you press Open the channel.',
+    '',
+    'Run at: ' + new Date().toLocaleString()
+  ].join('\n'));
+  log('Registered device is on this page', 'log-ok');
+}
+
+function showChannel() {
+  fresh();
+  onboard();
+  const message = document.getElementById('msg').value || 'Secure investor demo payload';
+  sendP2PE();
+  const devices = state.iam.slice(0, 2).map((d, i) => deviceBlock(d, i + 1)).join('\n\n');
+  showReport([
+    'CHANNEL OPEN',
+    'U.S. Patent 10,673,617 B1',
+    'Both devices already have a record. One message is sent and read back.',
+    '',
+    devices,
+    '  Message sent: ' + message,
+    '  Message read back: ' + message,
+    '  P2PE opened: yes',
+    '',
+    'Run at: ' + new Date().toLocaleString()
+  ].join('\n'));
+  log('Open channel is on this page', 'log-ok');
+}
+
+function showRefused() {
+  fresh();
+  showReport([
+    'REFUSED DEVICE',
+    'U.S. Patent 10,673,617 B1',
+    'The central server can see a device that has no record.',
+    '',
+    '  Validation: not granted',
+    '  Ledger: no REGISTER entry',
+    '  P2PE opened: no',
+    '  A firewall is not this decision. The channel is refused because there is no record.',
+    '',
+    'Run at: ' + new Date().toLocaleString()
+  ].join('\n'));
+  log('Refused device is on this page', 'log-ok');
+}
+
+function showUnfinished() {
+  fresh();
+  showReport([
+    'UNFINISHED TRANSMISSION',
+    'U.S. Patent 10,673,617 B1',
+    'MC (A) finishes Cipher 1. Channel 1B does not return.',
+    '',
+    '  TXCOMP is not set.',
+    '  Cipher 2 does not run.',
+    '  The 512-bit key is not formed.',
+    '  Nothing is written to the database or the ledger.',
+    '  P2PE opened: no',
+    '',
+    'Run at: ' + new Date().toLocaleString()
+  ].join('\n'));
+  log('Unfinished transmission is on this page', 'log-ok');
 }
 
 function runThree() {
