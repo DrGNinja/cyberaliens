@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Cyb3rALIENS · Fleet</title><style>
+:root { color-scheme: dark; --bg:#07110e; --surface:#101916; --surface-2:#18241f; --fg:#e7f0ea; --muted:#8ea399; --line:#24332c; --signal:#3ddc97; --signal-dim:#14382a; --alert:#e2b340; --alert-dim:#3a3014; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 ui-sans-serif, system-ui, sans-serif; }
+button, a.btn { font:inherit; cursor:pointer; }
+.wrap { max-width:72rem; margin:0 auto; padding:12px 16px 32px; }
+.kicker { font:12px/1 ui-monospace, monospace; letter-spacing:.14em; color:var(--signal); margin:0; }
+h1 { font-size:28px; margin:6px 0; letter-spacing:-.02em; }
+h2 { font-size:18px; margin:4px 0 0; }
+.muted { color:var(--muted); }
+.small { font-size:14px; }
+.tiny { font:12px/1.4 ui-monospace, monospace; color:var(--muted); }
+.row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.choices { display:flex; gap:8px; overflow-x:auto; margin:12px 0; }
+.choice { min-height:44px; min-width:11rem; text-align:left; border-radius:1rem; border:1px solid var(--line); background:var(--surface); color:var(--fg); padding:10px 12px; }
+.choice.on { border-color:var(--signal); background:var(--signal-dim); }
+.choice span { display:block; font-size:12px; color:var(--muted); margin-top:4px; }
+.btn { display:inline-flex; min-height:44px; align-items:center; border-radius:1rem; padding:0 16px; text-decoration:none; }
+.btn.solid { background:var(--signal); color:#07110e; font-weight:600; border:0; }
+.btn.ghost { background:transparent; color:var(--fg); border:1px solid var(--line); }
+.btn.soft { background:var(--surface-2); color:var(--fg); border:1px solid var(--line); }
+.board { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(16rem,.7fr); border:1px solid var(--line); border-radius:1rem; overflow:hidden; background:var(--surface); }
+.stage svg { width:100%; height:auto; display:block; }
+.chips { border-top:1px solid var(--line); padding:16px 20px; }
+.chipgrid { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin-top:12px; }
+.chip { border:1px solid var(--line); background:var(--surface-2); border-radius:1rem; padding:12px; }
+.chip.live { border-color:var(--signal); background:var(--signal-dim); }
+.chip.stop { border-color:var(--alert); background:var(--alert-dim); }
+.bar { height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-top:8px; }
+.bar > i { display:block; height:100%; background:var(--signal); }
+.bar.stop > i { background:var(--alert); }
+.rounds { display:flex; gap:4px; margin-top:8px; }
+.rounds i { flex:1; height:8px; border-radius:999px; background:var(--line); }
+.rounds i.on { background:var(--signal); }
+.rounds i.stop { background:var(--alert); }
+.side { padding:16px 20px; border-left:1px solid var(--line); display:flex; flex-direction:column; justify-content:space-between; gap:16px; }
+.pips { display:flex; gap:4px; padding:0 16px 16px; }
+.pips button { flex:1; height:8px; border:0; border-radius:999px; background:var(--line); padding:0; }
+.pips button.on { background:var(--signal); }
+.pips button.stop { background:var(--alert); }
+.tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; padding:0; list-style:none; }
+.tags li { border:1px solid var(--line); background:var(--surface-2); color:var(--signal); border-radius:999px; padding:4px 12px; font:12px ui-monospace, monospace; }
+video { width:100%; max-width:36rem; margin-top:12px; border-radius:1rem; border:1px solid var(--line); background:#000; }
+.shot { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#000; border-radius:1rem; border:1px solid var(--line); }
+footer { max-width:72rem; margin:0 auto; padding:0 16px 32px; font-size:12px; color:var(--muted); }
+@media (max-width:900px) {
+  .board, .chipgrid { grid-template-columns:1fr; }
+  .side { border-left:0; border-top:1px solid var(--line); }
+}
+</style></head><body>
+<main class="wrap">
+  <p class="kicker">U.S. PATENT 10,673,617 B1</p>
+  <h1>Cyb3rALIENS · Fleet Gate</h1>
+  <p class="muted small" style="max-width:40rem">The picture follows the chapter, in the patent’s own order. FIG. 4 is the pulse-generator can, not a procedure.</p>
+  <p class="row" style="margin:12px 0"><a class="btn ghost" href="index.html">Back to the briefing</a></p>
+  <img id="shot" class="shot" alt=""/>
+  <p class="kicker" id="title" style="margin-top:12px"></p>
+  <p class="muted small" id="line"></p>
+  <p class="tiny" id="marks"></p>
+  <div class="row" style="margin-top:12px">
+    <button class="btn solid" id="pause" type="button">Pause</button>
+    <button class="btn soft" id="replay" type="button">Replay</button>
+  </div>
+  <div class="pips" id="pips" style="padding-left:0"></div>
+</main>
+<footer>FIGS. 1 through 6 are the patent’s own housings: the dock, the PCI card, the adapter, the pulse-generator can, the voting terminal, and the car. A vehicle with no P2PE device is tracked as non-registered and cannot open the channel. A firewall is an ordinary control, not part of the patented method.</footer>
+<script>
+const BEATS = [{"id": "roll", "img": "fleet/usb.jpg", "seconds": 8, "title": "The device", "line": "A USB device is in the car. The two chips are dark. No channel is open.", "marks": "Device installed \u00b7 Not registered"}, {"id": "i2c", "img": "fleet/usb.jpg", "seconds": 8, "title": "I2C", "line": "MC (A) is master. MC (B) is slave. They join over I2C. Nothing else moves.", "marks": "Socket joined \u00b7 P2PE closed"}, {"id": "cipher1", "img": "fleet/usb.jpg", "seconds": 9, "title": "Cipher 1", "line": "Channel 1A and channel 1B each carry a different AES-SEA 256-bit key.", "marks": "Two keys \u00b7 Not yet 512-bit"}, {"id": "cipher2", "img": "fleet/usb.jpg", "seconds": 12, "title": "Cipher 2", "line": "Cipher 2 mixes those keys in rounds of 10. Then the AES-SEA 512-bit validation key exists.", "marks": "Rounds of 10 \u00b7 P2PE still closed"}, {"id": "record", "img": "fleet/usb.jpg", "seconds": 12, "title": "The record", "line": "IAM collects the MAC address, serial number, and fingerprint identity. The central server marks the vehicle registered. The blockchain writes a hash-chained block.", "marks": "Registered \u00b7 P2PE still closed"}, {"id": "link", "img": "fleet/street.jpg", "seconds": 10, "title": "P2PE opens", "line": "Both vehicles are registered. One packet crosses on the AES-SEA 512-bit key.", "marks": "Registered \u00b7 P2PE open"}, {"id": "outside", "img": "fleet/street.jpg", "seconds": 11, "title": "Refused", "line": "This car has no P2PE device. The packet stops. The patent tracks it as non-registered. A firewall is not this key.", "marks": "Non-registered \u00b7 P2PE refused"}, {"id": "dock", "img": "fleet/dock.jpg", "seconds": 8, "title": "Docking station", "line": "FIG. 1. The same two chips sit in a docking station and retrofit an IoT device over USB.", "marks": "FIG. 1 \u00b7 same method"}, {"id": "pci", "img": "fleet/pci.jpg", "seconds": 8, "title": "PCI card", "line": "FIGS. 2A and 2B. MC (A) and MC (B) are on a PCI card inserted in the computer.", "marks": "FIGS. 2A\u20132B \u00b7 same method"}, {"id": "adapter", "img": "fleet/adapter.jpg", "seconds": 8, "title": "PCI adapter", "line": "FIG. 3. An adapter carries the same card so an existing machine can be retrofitted.", "marks": "FIG. 3 \u00b7 same method"}, {"id": "pacemaker", "img": "fleet/pacemaker.jpg", "seconds": 8, "title": "Pacemaker", "line": "FIG. 4. The two chips are inside the sealed pulse-generator can. This is the device, not a procedure.", "marks": "FIG. 4 \u00b7 device only"}, {"id": "vote", "img": "fleet/vote.jpg", "seconds": 8, "title": "Voting terminal", "line": "FIG. 5. The P2PE device plugs into the voting machine over USB and registers the same way.", "marks": "FIG. 5 \u00b7 same method"}];
+let index = 0, local = 0, playing = true, last = performance.now();
+function draw() {
+  const beat = BEATS[index];
+  document.getElementById("shot").src = beat.img;
+  document.getElementById("title").textContent = beat.title + " · " + (index+1) + " / " + BEATS.length;
+  document.getElementById("line").textContent = beat.line;
+  document.getElementById("marks").textContent = beat.marks;
+  document.getElementById("pause").textContent = playing ? "Pause" : "Play";
+  document.getElementById("pips").innerHTML = BEATS.map((item, i) => '<button type="button" class="'+(i<=index?"on":"")+'" data-i="'+i+'"></button>').join("");
+  document.querySelectorAll("#pips button").forEach(button => button.onclick = () => { index = Number(button.dataset.i); local = 0; playing = true; });
+}
+document.getElementById("pause").onclick = () => { playing = !playing; };
+document.getElementById("replay").onclick = () => { index = 0; local = 0; playing = true; };
+function tick(now) {
+  const dt = Math.min(0.05, (now-last)/1000); last = now;
+  if (playing) {
+    local += dt;
+    if (local >= BEATS[index].seconds) {
+      local = 0;
+      index = (index + 1) % BEATS.length;
+    }
+  }
+  draw();
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script></body></html>
