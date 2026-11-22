@@ -53,12 +53,14 @@
   </div>
   <div class="row">
     <a href="index.html">All demonstrations</a>
+    <button id="back" type="button">Back</button>
     <button class="solid" id="pause" type="button">Pause</button>
+    <button id="next" type="button">Next</button>
     <button id="replay" type="button">Replay</button>
   </div>
 </header>
 <main>
-  <p class="now"><span class="kicker" id="beat-name"></span><br><span id="beat-copy"></span></p>
+  <p class="now"><span class="kicker" id="beat-name"></span><br><strong id="beat-plain"></strong><br><span class="muted" id="beat-copy"></span></p>
   <div class="layout">
     <section class="card">
       <h2>Fleet</h2>
@@ -108,18 +110,18 @@ let local = 0;
 function light(id, key, value) { devices[id].stage[key] = value; }
 
 const beats = [
-  { name: "Dark fleet", ms: 5000, focus: "a", copy: "Three vehicles and one dock. No chip has joined. No channel is open.", run() {} },
-  { name: "I2C", ms: 6000, focus: "a", copy: "Vehicle A. MC (A) is master. MC (B) is slave. They join on I2C.", run() { light("a", "i2c", "on"); } },
-  { name: "Cipher 1", ms: 7000, focus: "a", copy: "Channel 1A and channel 1B each carry a different AES-SEA 256-bit key. The timer feeds the clock.", run() { light("a", "c1", "on"); } },
-  { name: "Cipher 2", ms: 7000, focus: "a", copy: "Ten rounds. The AES-SEA 512-bit validation key now exists.", run() { light("a", "c2", "on"); } },
-  { name: "Certificate", ms: 5500, focus: "a", copy: "The 512-bit key is sent to the PKI server. AES-2048 places the certificate.", run() { light("a", "pki", "on"); } },
-  { name: "Identity", ms: 7000, focus: "a", copy: "IAM collects the MAC address, the serial number, and the fingerprint. The central server marks Vehicle A registered.", run() { light("a", "dna", "on"); light("a", "db", "on"); } },
-  { name: "Ledger", ms: 6000, focus: "a", copy: "A block is written. It carries the hash of the previous block. A DApp channel links IAM to the ledger.", run() { light("a", "chain", "on"); } },
-  { name: "Second device", ms: 7000, focus: "b", copy: "Vehicle B completes the same stack. Same chips. Same method. It can now verify.", run() { ["i2c","c1","c2","pki","dna","db","chain"].forEach(k => light("b", k, "on")); } },
-  { name: "Zero-knowledge proof", ms: 8000, focus: "a", copy: "Vehicle A is the prover. Vehicle B is the verifier. The secret is not unveiled. The proof is accepted.", run() { light("a", "zkp", "on"); light("b", "zkp", "on"); } },
-  { name: "P2PE", ms: 7000, focus: "a", copy: "Both devices have a record. One packet crosses on the 512-bit key.", run() { light("a", "p2pe", "on"); light("b", "p2pe", "on"); } },
-  { name: "Refused", ms: 7000, focus: "c", copy: "Vehicle C is seen by the central server. It has no record. The channel is refused. A firewall did not make this decision.", run() { light("c", "db", "stop"); } },
-  { name: "Unfinished", ms: 8000, focus: "d", copy: "Unit D, on a dock. Channel 1B does not return. TXCOMP is not set. Cipher 2 does not run. No key, no identity, no block, no channel.", run() { light("d", "i2c", "on"); light("d", "c1", "stop"); } }
+  { name: "Dark fleet", plain: "Nothing here is allowed to talk yet.", ms: 5000, focus: "a", copy: "Three vehicles and one dock. No chip has joined. No channel is open.", run() {} },
+  { name: "I2C", plain: "The two chips inside the first car wake up and connect to each other.", ms: 6000, focus: "a", copy: "Vehicle A. MC (A) is master. MC (B) is slave. They join on I2C.", run() { light("a", "i2c", "on"); } },
+  { name: "Cipher 1", plain: "Each chip prepares its own half of the key. The halves are not the same.", ms: 7000, focus: "a", copy: "Channel 1A and channel 1B each carry a different AES-SEA 256-bit key. The timer feeds the clock.", run() { light("a", "c1", "on"); } },
+  { name: "Cipher 2", plain: "The two halves are mixed ten times. Now there is one key.", ms: 7000, focus: "a", copy: "Ten rounds. The AES-SEA 512-bit validation key now exists.", run() { light("a", "c2", "on"); } },
+  { name: "Certificate", plain: "A certificate is issued so later steps can trust this key.", ms: 5500, focus: "a", copy: "The 512-bit key is sent to the PKI server. AES-2048 places the certificate.", run() { light("a", "pki", "on"); } },
+  { name: "Identity", plain: "The car gets an identity: a network address, a serial number, and a fingerprint.", ms: 7000, focus: "a", copy: "IAM collects the MAC address, the serial number, and the fingerprint. The central server marks Vehicle A registered.", run() { light("a", "dna", "on"); light("a", "db", "on"); } },
+  { name: "Ledger", plain: "That identity is written down in a record that points back to the one before it.", ms: 6000, focus: "a", copy: "A block is written. It carries the hash of the previous block. A DApp channel links IAM to the ledger.", run() { light("a", "chain", "on"); } },
+  { name: "Second device", plain: "The second car does the same thing. It is now able to check the first.", ms: 7000, focus: "b", copy: "Vehicle B completes the same stack. Same chips. Same method. It can now verify.", run() { ["i2c","c1","c2","pki","dna","db","chain"].forEach(k => light("b", k, "on")); } },
+  { name: "Zero-knowledge proof", plain: "The first car proves it holds the secret without showing the secret.", ms: 8000, focus: "a", copy: "Vehicle A is the prover. Vehicle B is the verifier. The secret is not unveiled. The proof is accepted.", run() { light("a", "zkp", "on"); light("b", "zkp", "on"); } },
+  { name: "P2PE", plain: "Only now are the two cars allowed to exchange one private message.", ms: 7000, focus: "a", copy: "Both devices have a record. One packet crosses on the 512-bit key.", run() { light("a", "p2pe", "on"); light("b", "p2pe", "on"); } },
+  { name: "Refused", plain: "A third car is visible. It has no identity, so it is not allowed to speak.", ms: 7000, focus: "c", copy: "Vehicle C is seen by the central server. It has no record. The channel is refused. A firewall did not make this decision.", run() { light("c", "db", "stop"); } },
+  { name: "Unfinished", plain: "If the chips do not finish talking, the key is never made and nothing after it happens.", ms: 8000, focus: "d", copy: "Unit D, on a dock. Channel 1B does not return. TXCOMP is not set. Cipher 2 does not run. No key, no identity, no block, no channel.", run() { light("d", "i2c", "on"); light("d", "c1", "stop"); } }
 ];
 
 let painted = "";
@@ -130,6 +132,7 @@ function render() {
   if (signature === painted) return;
   painted = signature;
   document.getElementById("beat-name").textContent = current.name + " · " + (beat + 1) + " / " + beats.length;
+  document.getElementById("beat-plain").textContent = current.plain;
   document.getElementById("beat-copy").textContent = current.copy;
   document.getElementById("pause").textContent = playing ? "Pause" : "Play";
   document.getElementById("fleet").innerHTML = Object.entries(devices).map(([id, device]) => {
@@ -166,8 +169,21 @@ function reset() {
   beats[0].run();
   render();
 }
-document.getElementById("pause").onclick = () => { playing = !playing; render(); };
+function go(next) {
+  if (next < 0 || next >= beats.length) return;
+  playing = false;
+  beat = next;
+  local = 0;
+  Object.values(devices).forEach(device => { device.stage = blank(); });
+  for (let i = 0; i <= beat; i++) beats[i].run();
+  focus = beats[beat].focus;
+  painted = "";
+  render();
+}
+document.getElementById("pause").onclick = () => { playing = !playing; painted = ""; render(); };
 document.getElementById("replay").onclick = reset;
+document.getElementById("back").onclick = () => go(beat - 1);
+document.getElementById("next").onclick = () => go(beat + 1);
 function tick(now) {
   const dt = Math.min(80, now - last); last = now;
   if (playing) {
