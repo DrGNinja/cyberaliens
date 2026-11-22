@@ -71,10 +71,16 @@
     <div class="msg" id="result">Choose Register on Vehicle A. Nothing is enrolled until you do.</div>
   </section>
   <section class="card" style="margin-top:12px">
-    <h2>Identities in this session</h2>
+    <h2>Identities in this visit</h2>
     <table id="book"><thead><tr><th>Device</th><th>Identity</th><th>State</th></tr></thead><tbody></tbody></table>
     <h2 style="margin-top:14px">Blocks in this visit</h2>
     <table id="chain"><thead><tr><th>Block</th><th>What was written</th><th>Check</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section class="card" style="margin-top:12px">
+    <h2>Record from the boards</h2>
+    <p class="muted">Paste a reading from the two microcontrollers. The page checks that it has the same four fields as the record above. The boards are not connected to this page.</p>
+    <textarea id="board" rows="5" style="width:100%;margin-top:8px;min-height:7rem;border-radius:12px;border:1px solid var(--line);background:#0c1612;color:var(--fg);padding:10px;font:14px/1.45 ui-monospace,monospace" placeholder="address: &#10;serial: &#10;fingerprint: &#10;block: "></textarea>
+    <div class="row" style="margin-top:8px"><button id="check-board" type="button">Check the reading</button></div>
   </section>
 </main>
 <footer>This visit keeps the record. Closing the tab starts clean. This is not yet the chip. The scrambled line simulates encryption. It is not the production AES-SEA output. Not a patent license.</footer>
@@ -164,6 +170,8 @@ function render() {
     document.getElementById("send").onclick = send;
     document.getElementById("move").onclick = moveChips;
   }
+  const boardButton = document.getElementById("check-board");
+  if (boardButton) boardButton.onclick = checkBoard;
   document.querySelector("#book tbody").innerHTML = devices.map(x => "<tr><td>" + x.name + "</td><td>" + (x.identity ? x.identity.mac + " · " + x.identity.serial + " · " + x.identity.dna : "None") + "</td><td>" + label(x) + "</td></tr>").join("");
   document.querySelector("#chain tbody").innerHTML = blocks.map(b => "<tr><td>" + b.n + "</td><td>" + b.what + "</td><td>" + b.check + "</td></tr>").join("") || "<tr><td colspan='3' class='muted'>No block yet</td></tr>";
   save();
@@ -203,11 +211,12 @@ function failRegistration() {
   say("The return between the chips did not finish. No 512-bit key was made. No identity was written. " + d.name + " is still not registered.");
   render();
 }
-function send() {
+async function send() {
   draft = document.getElementById("text").value;
   const from = devices[Number(document.getElementById("from").value)];
   const to = devices[Number(document.getElementById("to").value)];
-  if (!draft.trim()) { say("Type a message first."); return; }
+  const message = draft.trim();
+  if (!message) { say("Type a message first."); return; }
   if (from === to) { say("Choose two different devices."); return; }
   const blocked = [from, to].filter(d => d.status !== "registered");
   if (blocked.length) {
@@ -216,7 +225,43 @@ function send() {
     render();
     return;
   }
-  say("From " + from.name + "\nYou wrote: " + draft.trim() + "\nOn the channel it travels as:\n" + scramble(draft.trim()) + "\n" + to.name + " reads back: " + draft.trim());
+  const engine = await askEngine(message);
+  if (engine) {
+    say("Engine: the C++ program on this computer.\nFrom " + from.name + "\nYou wrote: " + message + "\nOn the channel it travels as:\n" + engine.cipher + "\n" + to.name + " reads back: " + engine.recovered + "\nThe identity above is still from this browser visit, not from that program.");
+    return;
+  }
+  say("Engine: this browser. The C++ program is not running on this computer, so this is not the production cipher.\nFrom " + from.name + "\nYou wrote: " + message + "\nOn the channel it travels as:\n" + scramble(message) + "\n" + to.name + " reads back: " + message);
+}
+async function askEngine(message) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 900);
+  try {
+    await fetch("http://127.0.0.1:8080/api/onboard", { method: "POST", signal: ctrl.signal });
+    const res = await fetch("http://127.0.0.1:8080/api/p2pe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: message.replaceAll('"', "'") }),
+      signal: ctrl.signal
+    });
+    const data = await res.json();
+    clearTimeout(timer);
+    if (data.status === "ok" && data.recovered === message.replaceAll('"', "'")) {
+      return { cipher: data.ciphertext_hex || "", recovered: data.recovered };
+    }
+  } catch (e) {
+    clearTimeout(timer);
+  }
+  return null;
+}
+function checkBoard() {
+  const text = document.getElementById("board").value.toLowerCase();
+  const need = ["address", "serial", "fingerprint", "block"];
+  const missing = need.filter(key => !new RegExp(key + "\\s*:\\s*\\S").test(text));
+  if (!missing.length) {
+    say("This reading has the same four fields as the record on this page: address, serial, fingerprint, and a block. The boards are not connected here. This check does not prove the chips produced it.");
+    return;
+  }
+  say("The reading is missing " + missing.join(", ") + ". A board record needs an address, a serial, a fingerprint, and a block.");
 }
 function moveChips() {
   const d = devices[selected];
