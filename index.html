@@ -1,198 +1,49 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Cyb3rALIENS</title><style>
-:root { color-scheme: dark; --bg:#07110e; --surface:#101916; --surface-2:#18241f; --fg:#e7f0ea; --muted:#8ea399; --line:#24332c; --signal:#3ddc97; --signal-dim:#14382a; --alert:#e2b340; --alert-dim:#3a3014; }
-* { box-sizing: border-box; }
-body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 ui-sans-serif, system-ui, sans-serif; }
-button, a.btn { font:inherit; cursor:pointer; }
-.wrap { max-width:72rem; margin:0 auto; padding:12px 16px 32px; }
-.kicker { font:12px/1 ui-monospace, monospace; letter-spacing:.14em; color:var(--signal); margin:0; }
-h1 { font-size:28px; margin:6px 0; letter-spacing:-.02em; }
-h2 { font-size:18px; margin:4px 0 0; }
-.muted { color:var(--muted); }
-.small { font-size:14px; }
-.tiny { font:12px/1.4 ui-monospace, monospace; color:var(--muted); }
-.row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-.choices { display:flex; gap:8px; overflow-x:auto; margin:12px 0; }
-.choice { min-height:44px; min-width:11rem; text-align:left; border-radius:1rem; border:1px solid var(--line); background:var(--surface); color:var(--fg); padding:10px 12px; }
-.choice.on { border-color:var(--signal); background:var(--signal-dim); }
-.choice span { display:block; font-size:12px; color:var(--muted); margin-top:4px; }
-.btn { display:inline-flex; min-height:44px; align-items:center; border-radius:1rem; padding:0 16px; text-decoration:none; }
-.btn.solid { background:var(--signal); color:#07110e; font-weight:600; border:0; }
-.btn.ghost { background:transparent; color:var(--fg); border:1px solid var(--line); }
-.btn.soft { background:var(--surface-2); color:var(--fg); border:1px solid var(--line); }
-.board { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(16rem,.7fr); border:1px solid var(--line); border-radius:1rem; overflow:hidden; background:var(--surface); }
-.stage svg { width:100%; height:auto; display:block; }
-.chips { border-top:1px solid var(--line); padding:16px 20px; }
-.chipgrid { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin-top:12px; }
-.chip { border:1px solid var(--line); background:var(--surface-2); border-radius:1rem; padding:12px; }
-.chip.live { border-color:var(--signal); background:var(--signal-dim); }
-.chip.stop { border-color:var(--alert); background:var(--alert-dim); }
-.bar { height:8px; border-radius:999px; background:var(--line); overflow:hidden; margin-top:8px; }
-.bar > i { display:block; height:100%; background:var(--signal); }
-.bar.stop > i { background:var(--alert); }
-.rounds { display:flex; gap:4px; margin-top:8px; }
-.rounds i { flex:1; height:8px; border-radius:999px; background:var(--line); }
-.rounds i.on { background:var(--signal); }
-.rounds i.stop { background:var(--alert); }
-.side { padding:16px 20px; border-left:1px solid var(--line); display:flex; flex-direction:column; justify-content:space-between; gap:16px; }
-.pips { display:flex; gap:4px; padding:0 16px 16px; }
-.pips button { flex:1; height:8px; border:0; border-radius:999px; background:var(--line); padding:0; }
-.pips button.on { background:var(--signal); }
-.pips button.stop { background:var(--alert); }
-.tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; padding:0; list-style:none; }
-.tags li { border:1px solid var(--line); background:var(--surface-2); color:var(--signal); border-radius:999px; padding:4px 12px; font:12px ui-monospace, monospace; }
-video { width:100%; max-width:36rem; margin-top:12px; border-radius:1rem; border:1px solid var(--line); background:#000; }
-.shot { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#000; border-radius:1rem; border:1px solid var(--line); }
-footer { max-width:72rem; margin:0 auto; padding:0 16px 32px; font-size:12px; color:var(--muted); }
-@media (max-width:900px) {
-  .board, .chipgrid { grid-template-columns:1fr; }
-  .side { border-left:0; border-top:1px solid var(--line); }
-}
-</style></head><body>
-<main class="wrap">
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cyb3rALIENS</title>
+<style>
+  :root { color-scheme: dark; --bg:#07110e; --surface:#101916; --fg:#e7f0ea; --muted:#8ea399; --line:#24332c; --signal:#3ddc97; --signal-dim:#14382a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 ui-sans-serif, system-ui, sans-serif; }
+  main { max-width:52rem; margin:0 auto; padding:28px 16px 48px; }
+  .kicker { font:12px/1 ui-monospace, monospace; letter-spacing:.14em; color:var(--signal); }
+  h1 { font-size:32px; margin:8px 0; letter-spacing:-.02em; }
+  .lead { color:var(--muted); max-width:38rem; }
+  .choices { display:grid; gap:12px; margin-top:28px; }
+  a.card { display:block; text-decoration:none; color:inherit; border:1px solid var(--line); background:var(--surface); border-radius:1rem; padding:18px 18px 16px; }
+  a.card:hover { border-color:var(--signal); }
+  a.card strong { display:block; font-size:18px; }
+  a.card span { display:block; margin-top:6px; color:var(--muted); font-size:14px; }
+  a.card em { display:block; margin-top:10px; font-style:normal; font:12px ui-monospace, monospace; color:var(--signal); }
+  footer { margin-top:28px; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
   <p class="kicker">U.S. PATENT 10,673,617 B1</p>
   <h1>Cyb3rALIENS</h1>
-  <p class="muted small" style="max-width:40rem">One device. Two microcontrollers. A 512-bit key. Then identity, the central database, and the blockchain.</p>
-  <p class="row" style="margin-top:12px">
-    <a class="btn solid" href="fleet.html">Watch the fleet</a>
-    <button class="btn ghost" id="film" type="button">Play the film</button>
-  </p>
-  <div id="player"></div>
-  <p class="tiny" style="max-width:22rem;margin-left:auto">A visual reading of the published method for a pitch or a leave-behind. It does not run the AES-SEA rounds and it is not the production chip.</p>
-  <div class="choices" id="choices"></div>
-  <div class="board">
-    <div>
-      <div class="stage" id="stage"></div>
-      <section class="chips" id="chips"></section>
-    </div>
-    <div class="side" id="side"></div>
-    <div class="pips" id="pips" style="grid-column:1 / -1"></div>
+  <p class="lead">Choose a demonstration. Each one stays at its own address. A new demonstration is another choice on this page.</p>
+  <div class="choices">
+    <a class="card" href="briefing.html">
+      <strong>Investor briefing</strong>
+      <span>The method on one screen: two microcontrollers, Cipher 1, Cipher 2 in rounds of 10, the record, and the film.</span>
+      <em>Open the briefing</em>
+    </a>
+    <a class="card" href="fleet.html">
+      <strong>Fleet and housings</strong>
+      <span>The same method in the car, then the dock, the PCI card, the adapter, the pulse-generator can, and the voting terminal.</span>
+      <em>Watch the fleet</em>
+    </a>
+    <a class="card" href="web/full_demo.html">
+      <strong>Technical simulation</strong>
+      <span>The earlier C++ demonstration in the browser: entropy, DNA identity, IAM, the database, the ledger, and a failure test.</span>
+      <em>Open the simulation</em>
+    </a>
   </div>
+  <footer>Illustration of the method in U.S. Patent 10,673,617 B1. Educational demonstration. Not a patent license. The C++ source remains in this repository under src.</footer>
 </main>
-<footer>Illustration of the method in U.S. Patent 10,673,617 B1, inventors George Antoniou, Oresteban Carabeo, and Roberto Hernandez Espinosa. Educational demonstration. Not a patent license.</footer>
-<script>
-const SCENARIOS = [{"id": "registered", "label": "Registered device", "outcome": "Identity recorded. P2PE opens.", "beats": [{"id": "pair", "kicker": "Claim 1(a)", "title": "Two microcontrollers, one device", "detail": "MC (A) and MC (B) sit inside the IoT device and are joined by an I2C socket. MC (A) is programmed in master mode. MC (B) is programmed in slave mode.", "source": "U.S. 10,673,617 B1, claim 1(a) and the master/slave programming", "duration": 4200, "live": ["mca", "mcb"], "packets": [{"id": "i2c", "from": "mca", "to": "mcb", "label": "I2C"}], "tone": "ok"}, {"id": "cipher1", "kicker": "Claim 1(c)", "title": "Cipher 1 \u2014 two different 256-bit keys", "detail": "Channel 1A carries an AES-SEA 256-bit key from MC (A) to Cipher 1 and back. At the same time, channel 1B carries a different AES-SEA 256-bit key from MC (B) to Cipher 1 and back.", "source": "Claim 1(c), channels 1A and 1B", "duration": 5200, "live": ["mca", "mcb", "cipher1"], "packets": [{"id": "1a", "from": "mca", "to": "cipher1", "label": "1A \u00b7 256-bit"}, {"id": "1b", "from": "mcb", "to": "cipher1", "label": "1B \u00b7 256-bit"}], "tone": "ok"}, {"id": "timer", "kicker": "Abstract", "title": "Time-based pseudo-random process", "detail": "A timer on each microcontroller takes the clock frequency as its input. That time base modifies the pseudo-random process behind the real-time symmetrical key.", "source": "Abstract: timer input of the clock frequency", "duration": 4200, "live": ["mca", "mcb", "timer"], "packets": [{"id": "ta", "from": "mca", "to": "timer", "label": "clock"}, {"id": "tb", "from": "mcb", "to": "timer", "label": "clock"}], "tone": "ok"}, {"id": "cipher2", "kicker": "Claim 1(d)", "title": "Cipher 2 \u2014 the 512-bit key, in rounds of 10", "detail": "Communication between MC (A) and MC (B) brings the two 256-bit keys into Cipher 2. Together they generate the AES-SEA 512-bit validation key, in rounds of 10.", "source": "Abstract and claim 1(d)", "duration": 5200, "live": ["cipher1", "cipher2", "key512"], "packets": [{"id": "c2a", "from": "cipher1", "to": "cipher2", "label": "256 + 256"}, {"id": "c2b", "from": "cipher2", "to": "key512", "label": "512-bit"}], "tone": "ok"}, {"id": "pki", "kicker": "PKI \u00b7 AES-2048", "title": "Certificate from the PKI server", "detail": "The 512-bit key is sent to the PKI server. The AES-2048 key is used to place a certificate for validation, authentication, and authorization through the blockchain ecosystem.", "source": "Specification: PKI server AES 2048 key", "duration": 4200, "live": ["key512", "pki"], "packets": [{"id": "pki", "from": "key512", "to": "pki", "label": "AES-2048"}], "tone": "ok"}, {"id": "iam", "kicker": "IAM", "title": "Identity collected", "detail": "IAM gathers the MAC address, the serial number, and the fingerprint identity, then sends that collection to the central server.", "source": "IAM method in the specification", "duration": 4600, "live": ["pki", "iam"], "packets": [{"id": "iam", "from": "pki", "to": "iam", "label": "MAC \u00b7 serial \u00b7 fingerprint"}], "tone": "ok", "identity": true}, {"id": "csd", "kicker": "Central server database", "title": "Unique record created", "detail": "The central server creates a database record and a repository directory for this IoT device and marks it registered.", "source": "Abstract: track registered and non-registered devices", "duration": 4200, "live": ["iam", "csd"], "packets": [{"id": "csd", "from": "iam", "to": "csd", "label": "record"}], "tone": "ok", "identity": true}, {"id": "bce", "kicker": "Blockchain ecosystem", "title": "Hash-chained block", "detail": "The identity is written into a block that carries the hash of the previous block. A zero-knowledge proof checks it. A DApp channel links IAM and the blockchain.", "source": "Specification: BCE ledger, ZKP, DApp", "duration": 4800, "live": ["csd", "bce"], "packets": [{"id": "bce", "from": "csd", "to": "bce", "label": "block"}], "tone": "ok", "identity": true, "ledger": "REG"}, {"id": "p2pe", "kicker": "P2PE", "title": "Point-to-point encryption opens", "detail": "The device is validated. P2PE encrypts from this IoT device to the other endpoint, using the AES-SEA 512-bit key.", "source": "Specification: P2PE starts once the 512-bit key exists", "duration": 4600, "live": ["bce", "pointb", "key512"], "packets": [{"id": "p2pe", "from": "bce", "to": "pointb", "label": "P2PE"}], "tone": "ok", "identity": true, "ledger": "P2PE"}]}, {"id": "unregistered", "label": "Non-registered device", "outcome": "Tracked. Access is not granted.", "beats": [{"id": "pair", "kicker": "Claim 1(a)", "title": "Two microcontrollers, one device", "detail": "MC (A) and MC (B) sit inside the IoT device and are joined by an I2C socket. MC (A) is programmed in master mode. MC (B) is programmed in slave mode.", "source": "U.S. 10,673,617 B1, claim 1(a) and the master/slave programming", "duration": 4200, "live": ["mca", "mcb"], "packets": [{"id": "i2c", "from": "mca", "to": "mcb", "label": "I2C"}], "tone": "ok"}, {"id": "cipher1", "kicker": "Claim 1(c)", "title": "Cipher 1 \u2014 two different 256-bit keys", "detail": "Channel 1A carries an AES-SEA 256-bit key from MC (A) to Cipher 1 and back. At the same time, channel 1B carries a different AES-SEA 256-bit key from MC (B) to Cipher 1 and back.", "source": "Claim 1(c), channels 1A and 1B", "duration": 5200, "live": ["mca", "mcb", "cipher1"], "packets": [{"id": "1a", "from": "mca", "to": "cipher1", "label": "1A \u00b7 256-bit"}, {"id": "1b", "from": "mcb", "to": "cipher1", "label": "1B \u00b7 256-bit"}], "tone": "ok"}, {"id": "timer", "kicker": "Abstract", "title": "Time-based pseudo-random process", "detail": "A timer on each microcontroller takes the clock frequency as its input. That time base modifies the pseudo-random process behind the real-time symmetrical key.", "source": "Abstract: timer input of the clock frequency", "duration": 4200, "live": ["mca", "mcb", "timer"], "packets": [{"id": "ta", "from": "mca", "to": "timer", "label": "clock"}, {"id": "tb", "from": "mcb", "to": "timer", "label": "clock"}], "tone": "ok"}, {"id": "cipher2", "kicker": "Claim 1(d)", "title": "Cipher 2 \u2014 the 512-bit key, in rounds of 10", "detail": "Communication between MC (A) and MC (B) brings the two 256-bit keys into Cipher 2. Together they generate the AES-SEA 512-bit validation key, in rounds of 10.", "source": "Abstract and claim 1(d)", "duration": 5200, "live": ["cipher1", "cipher2", "key512"], "packets": [{"id": "c2a", "from": "cipher1", "to": "cipher2", "label": "256 + 256"}, {"id": "c2b", "from": "cipher2", "to": "key512", "label": "512-bit"}], "tone": "ok"}, {"id": "pki", "kicker": "PKI \u00b7 AES-2048", "title": "Certificate from the PKI server", "detail": "The 512-bit key is sent to the PKI server. The AES-2048 key is used to place a certificate for validation, authentication, and authorization through the blockchain ecosystem.", "source": "Specification: PKI server AES 2048 key", "duration": 4200, "live": ["key512", "pki"], "packets": [{"id": "pki", "from": "key512", "to": "pki", "label": "AES-2048"}], "tone": "ok"}, {"id": "iam-no", "kicker": "IAM", "title": "Identity reaches the central server", "detail": "IAM still collects the MAC address, serial number, and fingerprint identity. The central server can see the device.", "source": "IAM method in the specification", "duration": 4200, "live": ["pki", "iam", "csd"], "packets": [{"id": "iam", "from": "pki", "to": "csd", "label": "identity"}], "tone": "ok", "identity": true}, {"id": "not-reg", "kicker": "Central server database", "title": "Recorded as non-registered", "detail": "The patent\u2019s central server tracks both registered and non-registered devices. This one is not registered, so IAM does not grant access.", "source": "Abstract: registered and non-registered IoT devices", "duration": 4800, "live": ["csd", "iam"], "packets": [], "tone": "stop", "identity": true}, {"id": "no-p2pe", "kicker": "Blockchain ecosystem", "title": "Not marked valid. No P2PE.", "detail": "The blockchain does not mark the device valid. The point-to-point channel does not open.", "source": "Specification: validation before P2PE", "duration": 4200, "live": ["bce", "pointb"], "packets": [], "tone": "stop", "identity": true}]}, {"id": "restart", "label": "Transmission incomplete", "outcome": "Method restarts. No 512-bit key.", "beats": [{"id": "pair", "kicker": "Claim 1(a)", "title": "Two microcontrollers, one device", "detail": "MC (A) and MC (B) sit inside the IoT device and are joined by an I2C socket. MC (A) is programmed in master mode. MC (B) is programmed in slave mode.", "source": "U.S. 10,673,617 B1, claim 1(a) and the master/slave programming", "duration": 4200, "live": ["mca", "mcb"], "packets": [{"id": "i2c", "from": "mca", "to": "mcb", "label": "I2C"}], "tone": "ok"}, {"id": "cipher1-fail", "kicker": "Claim 1(c)", "title": "Channel 1B does not complete", "detail": "MC (A) finishes its trip through Cipher 1. The return on channel 1B does not. The TWI status bit TXCOMP is not set.", "source": "Specification: if TXCOMP is not 1, restart the method", "duration": 5200, "live": ["mca", "cipher1"], "packets": [{"id": "1a", "from": "mca", "to": "cipher1", "label": "1A completes"}], "tone": "stop"}, {"id": "restart", "kicker": "TWI status", "title": "The method restarts", "detail": "Cipher 2 does not run. The AES-SEA 512-bit key is not generated. Nothing is sent to the PKI server, the database, or the blockchain.", "source": "Master/slave programming: TXCOMP must be 1", "duration": 4800, "live": ["mca", "mcb"], "packets": [{"id": "back", "from": "cipher1", "to": "mca", "label": "restart"}], "tone": "stop"}]}];
-const boxes = {
-  mca:{x:48,y:118,w:118,h:72,title:"MC (A)",sub:"Master"},
-  mcb:{x:186,y:118,w:118,h:72,title:"MC (B)",sub:"Slave"},
-  timer:{x:48,y:250,w:256,h:64,title:"Timer",sub:"Clock frequency in"},
-  cipher1:{x:360,y:78,w:176,h:78,title:"Cipher 1",sub:"AES-SEA 256-bit"},
-  cipher2:{x:360,y:196,w:176,h:78,title:"Cipher 2",sub:"Rounds of 10"},
-  key512:{x:360,y:314,w:176,h:78,title:"512-bit key",sub:"AES-SEA validation"},
-  pki:{x:590,y:78,w:188,h:78,title:"PKI server",sub:"AES-2048 certificate"},
-  iam:{x:590,y:196,w:188,h:86,title:"IAM",sub:"Identity access"},
-  csd:{x:590,y:322,w:188,h:86,title:"Central server",sub:"Database record"},
-  bce:{x:830,y:78,w:220,h:150,title:"Blockchain",sub:"Hash-chained ledger"},
-  pointb:{x:830,y:292,w:220,h:116,title:"Point B",sub:"P2PE endpoint"}
-};
-function center(id) { const b = boxes[id]; return {x:b.x+b.w/2, y:b.y+b.h/2}; }
-function pointOn(packet, t) {
-  const a = center(packet.from), b = center(packet.to);
-  const going = t < 0.5;
-  const from = going ? a : b, to = going ? b : a;
-  const local = going ? t*2 : (t-0.5)*2;
-  return {x:from.x+(to.x-from.x)*local, y:from.y+(to.y-from.y)*local, label:packet.label};
-}
-let scenarioId = "registered", beatIndex = 0, progress = 0, playing = true;
-const scenario = () => SCENARIOS.find(s => s.id === scenarioId);
-const beat = () => scenario().beats[beatIndex];
-function load(id) { scenarioId = id; beatIndex = 0; progress = 0; playing = true; }
-function draw() {
-  const s = scenario(), b = beat(), live = new Set(b.live), alert = b.tone === "stop";
-  let svg = '<svg viewBox="0 0 1080 470" role="img"><rect x="24" y="56" width="304" height="290" rx="16" fill="#101916" stroke="#8eaa9e"/>';
-  svg += '<text x="40" y="80" fill="#8ea399" font-size="11" font-family="ui-monospace,monospace">IOT DEVICE</text>';
-  svg += '<text x="40" y="330" fill="#8ea399" font-size="11">MC (A) and MC (B) embedded</text>';
-  svg += '<line x1="'+(boxes.mca.x+boxes.mca.w)+'" y1="'+center("mca").y+'" x2="'+boxes.mcb.x+'" y2="'+center("mcb").y+'" stroke="'+(live.has("mca")&&live.has("mcb")?"#3ddc97":"#4d675c")+'" stroke-width="2"/>';
-  svg += '<text x="158" y="112" fill="#8ea399" font-size="10" font-family="ui-monospace,monospace">I2C</text>';
-  for (const [id, box] of Object.entries(boxes)) {
-    const on = live.has(id);
-    const stroke = on ? (alert ? "#e2b340" : "#3ddc97") : "#8eaa9e";
-    const fill = on ? (alert ? "#3a3014" : "#14382a") : "#1c2b25";
-    svg += '<rect x="'+box.x+'" y="'+box.y+'" width="'+box.w+'" height="'+box.h+'" rx="12" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+(on?2:1)+'"/>';
-    svg += '<text x="'+(box.x+14)+'" y="'+(box.y+28)+'" fill="#e7f0ea" font-size="15">'+box.title+'</text>';
-    svg += '<text x="'+(box.x+14)+'" y="'+(box.y+48)+'" fill="#8ea399" font-size="11">'+box.sub+'</text>';
-  }
-  const ledger = s.beats.slice(0, beatIndex+1).flatMap(item => item.ledger ? [item.ledger] : []);
-  ledger.forEach((label, i) => {
-    const x = 848 + i*64;
-    svg += '<rect x="'+x+'" y="168" width="56" height="40" rx="6" fill="#14382a" stroke="#3ddc97"/>';
-    svg += '<text x="'+(x+8)+'" y="186" fill="#e7f0ea" font-size="9" font-family="ui-monospace,monospace">BLK '+(i+1)+'</text>';
-    svg += '<text x="'+(x+8)+'" y="198" fill="#3ddc97" font-size="8" font-family="ui-monospace,monospace">'+label.slice(0,6)+'</text>';
-  });
-  b.packets.forEach(packet => {
-    const p = pointOn(packet, progress);
-    const a = center(packet.from), c = center(packet.to);
-    svg += '<line x1="'+a.x+'" y1="'+a.y+'" x2="'+c.x+'" y2="'+c.y+'" stroke="'+(alert?"#e2b340":"#3ddc97")+'" stroke-width="1.5" stroke-dasharray="4 6" opacity="0.7"/>';
-    svg += '<circle cx="'+p.x+'" cy="'+p.y+'" r="7" fill="'+(alert?"#e2b340":"#3ddc97")+'"/>';
-    svg += '<text x="'+(p.x+10)+'" y="'+(p.y-10)+'" fill="#e7f0ea" font-size="11" font-family="ui-monospace,monospace">'+p.label+'</text>';
-  });
-  svg += '</svg>';
-  document.getElementById("stage").innerHTML = svg;
-
-  const cipher1 = b.id === "cipher1" || b.id === "cipher1-fail";
-  const stalled = b.id === "cipher1-fail" || b.id === "restart";
-  const mixing = b.id === "cipher2";
-  const onClock = b.id === "timer";
-  const linked = b.id === "pair" || cipher1 || onClock || mixing || stalled;
-  const shown = !playing && progress < 0.05 ? (stalled ? 0.4 : 0.85) : progress;
-  const cipherAt = s.beats.findIndex(item => item.id === "cipher2");
-  const formed = cipherAt >= 0 && (beatIndex > cipherAt || (beatIndex === cipherAt && progress > 0.9));
-  const filled = mixing ? Math.max(1, Math.ceil(shown * 10)) : formed ? 10 : 0;
-  const travel = cipher1 ? (shown < 0.5 ? shown * 2 : 1) : mixing ? 1 : 0;
-  const returning = cipher1 && shown >= 0.5 && !stalled;
-  const chip = (name, role, lane, go, live, stop) => {
-    const edge = stop ? "chip stop" : live ? "chip live" : "chip";
-    const width = returning ? 100 : Math.round(go * 100);
-    return '<div class="'+edge+'"><div class="row" style="justify-content:space-between"><strong>'+name+'</strong><span class="tiny">'+role+'</span></div><p class="tiny">'+lane+'</p><div class="bar'+(stop?" stop":"")+'"><i style="width:'+width+'%"></i></div><p class="tiny">'+(go>0?"AES-SEA 256-bit":"Key not on the channel yet")+'</p></div>';
-  };
-  const rounds = Array.from({length:10}, (_, i) => '<i class="'+(i < filled ? (stalled ? "stop" : "on") : "")+'"></i>').join("");
-  document.getElementById("chips").innerHTML =
-    '<p class="kicker">DUAL MICROCONTROLLER ENCRYPTION</p><div class="chipgrid">' +
-    chip("MC (A)", "Master", "Channel 1A", travel, linked && b.tone === "ok", false) +
-    '<div style="text-align:center"><div class="tiny" style="color:'+(linked?"var(--signal)":"var(--muted)")+'">I2C</div><div style="height:1px;width:4rem;margin:4px auto;background:'+(linked?"var(--signal)":"var(--line)")+'"></div><div class="tiny">'+(onClock?"clock in":"socket")+'</div></div>' +
-    chip("MC (B)", "Slave", "Channel 1B", stalled ? Math.min(travel, 0.45) : travel, linked && b.tone === "ok" && !stalled, stalled) +
-    '</div><div style="margin-top:16px"><div class="row" style="justify-content:space-between"><strong class="small">Cipher 2 · rounds of 10</strong><span class="tiny">'+(formed?"512-bit key formed":stalled?"512-bit key not formed":"waiting on both 256-bit keys")+'</span></div><div class="rounds">'+rounds+'</div></div>';
-
-  const identity = s.beats.slice(0, beatIndex+1).some(item => item.identity);
-  document.getElementById("side").innerHTML =
-    '<div><p class="kicker">'+b.kicker+' <span class="muted">· '+(beatIndex+1)+' / '+s.beats.length+'</span></p><h2>'+b.title+'</h2><p class="muted small">'+b.detail+'</p><p class="tiny">'+b.source+'</p>' +
-    (identity ? '<ul class="tags"><li>MAC address</li><li>Serial number</li><li>Fingerprint identity</li></ul>' : '') +
-    '</div><div class="row"><button class="btn solid" id="pause" type="button">'+(playing?"Pause":"Play")+'</button><button class="btn soft" id="step" type="button">Step</button><button class="btn soft" id="restart" type="button">Restart</button></div>';
-  document.getElementById("pause").onclick = () => { playing = !playing; };
-  document.getElementById("step").onclick = () => {
-    playing = false;
-    beatIndex = beatIndex >= s.beats.length - 1 ? 0 : beatIndex + 1;
-    progress = 0;
-  };
-  document.getElementById("restart").onclick = () => { beatIndex = 0; progress = 0; playing = true; };
-  document.getElementById("pips").innerHTML = s.beats.map((item, index) => '<button type="button" class="'+(index<=beatIndex?(item.tone==="stop"?"stop":"on"):"")+'" data-i="'+index+'" aria-label="'+item.title+'"></button>').join("");
-  document.querySelectorAll("#pips button").forEach(button => button.onclick = () => { playing = false; beatIndex = Number(button.dataset.i); progress = 0; });
-  document.getElementById("choices").innerHTML = SCENARIOS.map(item => '<button type="button" class="choice'+(item.id===scenarioId?" on":"")+'" data-id="'+item.id+'"><strong>'+item.label+'</strong><span>'+item.outcome+'</span></button>').join("");
-  document.querySelectorAll(".choice").forEach(button => button.onclick = () => load(button.dataset.id));
-}
-document.getElementById("film").onclick = () => {
-  const holder = document.getElementById("player");
-  if (holder.querySelector("video")) return;
-  const video = document.createElement("video");
-  video.controls = true; video.playsInline = true; video.autoplay = true;
-  video.src = "cyb3raliens-p2pe-film.mp4";
-  holder.appendChild(video);
-};
-let last = performance.now();
-function tick(now) {
-  const dt = Math.min(48, now - last); last = now;
-  if (playing) {
-    const b = beat();
-    progress += dt / b.duration;
-    if (progress >= 1) {
-      if (beatIndex >= scenario().beats.length - 1) { playing = false; progress = 1; }
-      else { beatIndex += 1; progress = 0; }
-    }
-  }
-  draw();
-  requestAnimationFrame(tick);
-}
-requestAnimationFrame(tick);
-</script></body></html>
+</body>
+</html>
