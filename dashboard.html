@@ -31,7 +31,12 @@
   .steps { display:grid; gap:6px; margin:8px 0; }
   .step { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:14px; display:flex; justify-content:space-between; gap:8px; }
   .step.now { border-color:var(--signal); background:var(--signal-dim); }
-  .step.done { color:var(--signal); }
+  .rounds { display:flex; gap:4px; margin:8px 0; }
+  .rounds i { flex:1; height:8px; border-radius:99px; background:var(--line); display:block; }
+  .rounds i.on { background:var(--signal); }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .chip { border:1px solid var(--line); border-radius:12px; padding:8px; }
+  .chip.on { border-color:var(--signal); background:var(--signal-dim); }
   .msg { white-space:pre-wrap; font:14px/1.45 ui-monospace, monospace; background:#0c1612; border-radius:12px; padding:10px; min-height:4.5em; }
   table { width:100%; border-collapse:collapse; font-size:13px; }
   th, td { text-align:left; padding:6px 4px; border-bottom:1px solid var(--line); vertical-align:top; }
@@ -68,9 +73,11 @@
   <section class="card" style="margin-top:12px">
     <h2>Identities in this session</h2>
     <table id="book"><thead><tr><th>Device</th><th>Identity</th><th>State</th></tr></thead><tbody></tbody></table>
+    <h2 style="margin-top:14px">Blocks in this visit</h2>
+    <table id="chain"><thead><tr><th>Block</th><th>What was written</th><th>Check</th></tr></thead><tbody></tbody></table>
   </section>
 </main>
-<footer>A session you drive. Identities are created when you register and are not the production chip. The scrambled line simulates encryption. It is not the production AES-SEA output. Not a patent license.</footer>
+<footer>This visit keeps the record. Closing the tab starts clean. This is not yet the chip. The scrambled line simulates encryption. It is not the production AES-SEA output. Not a patent license.</footer>
 <script>
 const steps = [
   ["The two chips", "MC (A) leads. MC (B) answers. They join on I2C."],
@@ -78,7 +85,8 @@ const steps = [
   ["The 512-bit key", "The halves mix for ten rounds. One validation key exists."],
   ["Certificate", "AES-2048 places a certificate on that key."],
   ["Fingerprint", "The network address, serial number, and fingerprint are collected."],
-  ["The record", "The server writes the identity. It is not issued again."]
+  ["The block", "A block is written. It points to the previous block."],
+  ["The proof", "This device proves. A registered peer checks. The secret is not shown."]
 ];
 const housings = ["Car", "Dock", "Computer", "Pulse-generator can", "Voting terminal"];
 function hex(n) {
@@ -94,10 +102,24 @@ function scramble(text) {
   return [...bytes].map((b, i) => (b ^ (0x5a + i)).toString(16).padStart(2, "0")).join(" ");
 }
 const devices = ["Vehicle A", "Vehicle B", "Vehicle C"].map(name => ({
-  name, housing: "Car", status: "clear", identity: null, step: -1
+  name, housing: "Car", status: "clear", identity: null, step: -1, round: 0
 }));
 let selected = 0;
 let draft = "";
+let blocks = [];
+function save() {
+  sessionStorage.setItem("cyb3r-visit", JSON.stringify({ devices, selected, draft, blocks }));
+}
+function load() {
+  try {
+    const data = JSON.parse(sessionStorage.getItem("cyb3r-visit") || "null");
+    if (!data || !data.devices) return;
+    data.devices.forEach((saved, i) => { if (devices[i]) Object.assign(devices[i], saved); });
+    selected = data.selected || 0;
+    draft = data.draft || "";
+    blocks = data.blocks || [];
+  } catch (e) {}
+}
 
 function label(d) {
   if (d.status === "registered") return "Registered · " + d.housing;
@@ -118,14 +140,17 @@ function render() {
   const box = document.getElementById("action");
   if (d.status === "registering") {
     title.textContent = "Register " + d.name;
-    copy.textContent = "This follows the patent in order. The identity is written only on the last step.";
-    box.innerHTML = '<div class="steps">' + steps.map((s, i) => '<div class="step ' + (i < d.step ? "done" : i === d.step ? "now" : "") + '"><span>' + s[0] + '</span><span class="muted">' + (i === d.step ? s[1] : i < d.step ? "Done" : "Not yet") + '</span></div>').join("") + '</div><div class="row"><button class="solid" id="advance" type="button">' + (d.step === steps.length - 1 ? "Write the record" : "Next step") + '</button><button id="fail" type="button">The chips do not finish</button></div>';
+    copy.textContent = "The two chips, ten rounds, the block, then the proof. The identity is written only at the end.";
+    const lit = d.step > 2 ? 10 : d.step === 2 ? d.round : 0;
+    const dots = Array.from({ length: 10 }, (_, i) => '<i class="' + (i < lit ? "on" : "") + '"></i>').join("");
+    const nextLabel = d.step === 2 && d.round < 10 ? "Light round " + (d.round + 1) : d.step === steps.length - 1 ? "Write the record" : "Next step";
+    box.innerHTML = '<div class="pair"><div class="chip on"><strong>MC (A)</strong><br><span class="muted">Leads</span></div><div class="chip on"><strong>MC (B)</strong><br><span class="muted">Answers</span></div></div><div class="rounds">' + dots + '</div><p class="muted">Round ' + lit + ' of 10</p><div class="steps">' + steps.map((s, i) => '<div class="step ' + (i < d.step ? "done" : i === d.step ? "now" : "") + '"><span>' + s[0] + '</span><span class="muted">' + (i === d.step ? s[1] : i < d.step ? "Done" : "Not yet") + '</span></div>').join("") + '</div><div class="row"><button class="solid" id="advance" type="button">' + nextLabel + '</button><button id="fail" type="button">The chips do not finish</button></div>';
     document.getElementById("advance").onclick = advance;
     document.getElementById("fail").onclick = failRegistration;
   } else {
     const registered = devices.filter(x => x.status === "registered");
     title.textContent = registered.length < 2 ? "Register two devices" : "Send a message you write";
-    copy.textContent = "The identity stays with the chips that created it. Moving those chips forfeits the device.";
+    copy.textContent = "The fingerprint belongs to the chips that created it. A new housing does not inherit that identity.";
     const options = devices.map((x, i) => '<option value="' + i + '">' + x.name + '</option>').join("");
     box.innerHTML = '<div class="row"><button class="solid" id="begin" type="button">Register ' + d.name + '</button></div>'
       + '<div class="row" style="margin-top:10px"><select id="from">' + options + '</select><select id="to">' + options + '</select><input id="text" placeholder="Type a message"></div>'
@@ -140,6 +165,8 @@ function render() {
     document.getElementById("move").onclick = moveChips;
   }
   document.querySelector("#book tbody").innerHTML = devices.map(x => "<tr><td>" + x.name + "</td><td>" + (x.identity ? x.identity.mac + " · " + x.identity.serial + " · " + x.identity.dna : "None") + "</td><td>" + label(x) + "</td></tr>").join("");
+  document.querySelector("#chain tbody").innerHTML = blocks.map(b => "<tr><td>" + b.n + "</td><td>" + b.what + "</td><td>" + b.check + "</td></tr>").join("") || "<tr><td colspan='3' class='muted'>No block yet</td></tr>";
+  save();
 }
 function say(text) { document.getElementById("result").textContent = text; }
 function begin() {
@@ -150,22 +177,28 @@ function begin() {
   }
   d.status = "registering";
   d.step = 0;
+  d.round = 0;
   say(d.name + " is enrolling. Nothing is written until the last step.");
   render();
 }
 function advance() {
   const d = devices[selected];
+  if (d.step === 2 && d.round < 10) { d.round += 1; render(); return; }
   if (d.step < steps.length - 1) { d.step += 1; render(); return; }
   d.status = "registered";
   d.identity = { mac: mac(), serial: "CYB-" + hex(2).toUpperCase(), dna: hex(2).toUpperCase() + "…" + hex(2).toUpperCase() };
   d.step = -1;
-  say(d.name + " is registered.\nAddress " + d.identity.mac + "\nSerial " + d.identity.serial + "\nFingerprint " + d.identity.dna + "\nThis identity will not be issued again, and these chips cannot be moved to another device.");
+  const peer = devices.find(x => x !== d && x.status === "registered");
+  const proof = peer ? d.name + " proves. " + peer.name + " checks. The secret is not shown." : d.name + " can prove. The secret is not shown. The check completes when a second device is registered.";
+  blocks.push({ n: blocks.length + 1, what: d.name + " registered", check: blocks.length ? "Points to block " + blocks.length : "Points to the start" });
+  say(d.name + " is registered.\nAddress " + d.identity.mac + "\nSerial " + d.identity.serial + "\nFingerprint " + d.identity.dna + "\nBlock " + blocks.length + " points to " + (blocks.length === 1 ? "the start" : "block " + (blocks.length - 1)) + ".\n" + proof + "\nThis identity is not issued again.");
   render();
 }
 function failRegistration() {
   const d = devices[selected];
   d.status = "clear";
   d.step = -1;
+  d.round = 0;
   d.identity = null;
   say("The return between the chips did not finish. No 512-bit key was made. No identity was written. " + d.name + " is still not registered.");
   render();
@@ -199,9 +232,10 @@ function moveChips() {
   const previous = d.housing;
   d.housing = housing;
   d.status = "forfeit";
-  say(d.name + " was registered to the " + previous + ". The chips were moved to a " + housing + ". The fingerprint does not match the new device, so the identity is forfeited. The record remains. The private channel will not open.");
+  say(d.name + " was registered to the " + previous + ". The chips were moved to a " + housing + ". The fingerprint belongs to the chips that enrolled, so the new housing does not inherit it. The record remains. The private channel will not open.");
   render();
 }
+load();
 render();
 </script>
 </body>
