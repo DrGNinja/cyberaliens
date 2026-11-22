@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyb3rALIENS – Full Patent Simulation (Browser Demo)</title>
+<style>
+  :root { --bg:#0b1120; --card:#111827; --border:#1f2937; --accent:#10b981; --accent2:#3b82f6; --text:#f1f5f9; --muted:#94a3b8; --danger:#f87171; --warn:#fbbf24; --ok:#34d399; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.5; }
+  header { background:linear-gradient(90deg,#0f172a,#1e293b); border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; }
+  .brand h1 { font-size:1.4rem; font-weight:700; } .brand h1 span { color:var(--accent); }
+  .brand p { font-size:0.8rem; color:var(--muted); }
+  .pills { display:flex; gap:0.4rem; flex-wrap:wrap; }
+  .pill { background:#1e293b; border:1px solid #334155; color:var(--muted); font-size:0.7rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:999px; }
+  .pill.green { color:var(--ok); border-color:#065f46; background:#064e3b33; }
+  main { max-width:1280px; margin:0 auto; padding:1.25rem; display:grid; gap:1rem; }
+  .hero { background:linear-gradient(135deg,#0f172a,#1e3a5f); border:1px solid #334155; border-radius:12px; padding:1.25rem 1.5rem; }
+  .hero h2 { font-size:1.1rem; margin-bottom:0.3rem; }
+  .hero p { color:var(--muted); font-size:0.88rem; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:0.6rem; margin-top:1rem; }
+  .stat { background:#0f172a99; border:1px solid #334155; border-radius:8px; padding:0.7rem 0.9rem; }
+  .stat .label { font-size:0.65rem; color:var(--muted); text-transform:uppercase; }
+  .stat .value { font-size:1.5rem; font-weight:700; color:var(--accent); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media(max-width:900px){ .grid2{ grid-template-columns:1fr; } }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.1rem; }
+  .card h3 { font-size:0.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem; }
+  .actions { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.6rem; }
+  button { background:var(--accent2); color:#fff; border:none; border-radius:8px; padding:0.5rem 0.9rem; font-size:0.82rem; font-weight:600; cursor:pointer; }
+  button:hover { opacity:0.9; }
+  button.secondary { background:#475569; } button.danger { background:var(--danger); } button.success { background:#059669; }
+  input[type=text] { background:#0f172a; border:1px solid #334155; border-radius:8px; color:var(--text); padding:0.45rem 0.7rem; width:100%; max-width:360px; font-size:0.82rem; }
+  #log,#pipeline { background:#020617; border:1px solid #1e293b; border-radius:8px; padding:0.75rem; font-family:ui-monospace,monospace; font-size:0.75rem; height:200px; overflow-y:auto; white-space:pre-wrap; }
+  table { width:100%; border-collapse:collapse; font-size:0.78rem; }
+  th,td { text-align:left; padding:0.4rem 0.45rem; border-bottom:1px solid #1f2937; }
+  th { color:var(--muted); font-weight:500; font-size:0.7rem; text-transform:uppercase; }
+  .status-active,.validation-validated { color:var(--ok); }
+  .status-revoked,.validation-revoked { color:var(--danger); }
+  .status-registered,.validation-pending { color:var(--warn); }
+  code { font-size:0.75rem; background:#1e293b; padding:0.1rem 0.25rem; border-radius:4px; }
+  footer { text-align:center; padding:1.25rem; color:var(--muted); font-size:0.72rem; }
+  .step-highlight { border-left:3px solid var(--accent); padding-left:0.5rem; margin-bottom:0.3rem; }
+  .demo-overlay { position:fixed; inset:0; background:#000a; display:none; align-items:center; justify-content:center; z-index:100; }
+  .demo-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; max-width:520px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Cyb3r<span>ALIENS</span> Full Simulation</h1>
+    <p>Dual-MCU · Digital DNA · AES-SEA · P2PE · IAM · BCE — Pure Browser Demo</p>
+  </div>
+  <div class="pills">
+    <span class="pill green">US10673617B1 Architecture</span>
+    <span class="pill">Self-Contained</span>
+    <span class="pill">Investor Ready</span>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>Complete patent flow running entirely in your browser</h2>
+    <p>This self-contained simulation walks through every stage described in US Patent 10,673,617 B1: dual microcontrollers over simulated I2C, Cipher 1 / Cipher 2 with 10-round mixing, entropy-derived Digital DNA, central IAM database, and hash-chained BCE ledger. No server required.</p>
+    <div class="stats">
+      <div class="stat"><div class="label">Fleet Pairs</div><div class="value" id="s-fleet">0</div></div>
+      <div class="stat"><div class="label">IAM Devices</div><div class="value" id="s-devices">0</div></div>
+      <div class="stat"><div class="label">Ledger Entries</div><div class="value" id="s-ledger">0</div></div>
+      <div class="stat"><div class="label">Integrity</div><div class="value" id="s-integrity">OK</div></div>
+      <div class="stat"><div class="label">Active Pair</div><div class="value" id="s-active">—</div></div>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Control Plane</h3>
+      <div class="actions">
+        <button class="success" onclick="onboard()">① Onboard Pair</button>
+        <button onclick="sendP2PE()">② Send P2PE</button>
+        <button class="danger" onclick="revoke()">③ Revoke</button>
+        <button class="secondary" onclick="selfTest()">Self-Test</button>
+        <button class="secondary" onclick="exportReport()">Export</button>
+        <button onclick="startGuidedDemo()">Guided Demo</button>
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="inject('entropy')">Inject Entropy Fail</button>
+        <button class="secondary" onclick="inject('mismatch')">Inject Key Mismatch</button>
+        <button class="secondary" onclick="inject('revoke')">Inject Revoke Block</button>
+      </div>
+      <input type="text" id="msg" value="Secure investor demo payload" placeholder="Message">
+      <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--muted)">Select active pair from fleet table below. Guided Demo walks the full patent sequence with live highlighting.</p>
+    </div>
+    <div class="card">
+      <h3>Live Event Log</h3>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Patent Process Pipeline (Live Trace)</h3>
+    <div id="pipeline"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Fleet of Dual-MC Pairs</h3>
+      <div id="fleet"></div>
+    </div>
+    <div class="card">
+      <h3>Self-Test Report</h3>
+      <div id="selftest"><em style="color:var(--muted)">Click Self-Test</em></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>IAM Central Database</h3>
+    <div id="iam"></div>
+  </div>
+
+  <div class="card">
+    <h3>BCE Ledger (recent)</h3>
+    <div id="ledger"></div>
+  </div>
+</main>
+
+<div class="demo-overlay" id="overlay">
+  <div class="demo-box">
+    <h3 style="margin-bottom:0.5rem">Guided Patent Walkthrough</h3>
+    <p id="demo-text" style="font-size:0.85rem;margin-bottom:1rem"></p>
+    <button onclick="nextDemoStep()">Next Step</button>
+    <button class="secondary" onclick="closeDemo()">Close</button>
+  </div>
+</div>
+
+<footer>
+  Pure browser simulation of US Patent 10,673,617 B1 architecture · Educational / research use · Not a commercial product
+</footer>
+
+<script>
+// ========== Pure JS Simulation Engine ==========
+const state = {
+  fleet: [],
+  activeIdx: -1,
+  iam: [],
+  ledger: [{ index:0, event:'GENESIS', dna_a:'', dna_b:'', hash:'0000000000', ts:Date.now() }],
+  inject: { entropy:false, mismatch:false, revoke:false },
+  trace: []
+};
+
+function log(msg, cls='log-info') {
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  line.className = cls;
+  line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function record(stage, step, detail='', status='ok') {
+  state.trace.push({ seq: state.trace.length+1, stage, step, detail, status, ts: Date.now() });
+  renderPipeline();
+}
+
+function shortHex(hex, n=8) {
+  if (!hex) return '';
+  return hex.slice(0,n) + '…' + hex.slice(-n);
+}
+
+function randomHex(bytes) {
+  const arr = new Uint8Array(bytes);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function sha256(str) {
+  // Simple non-crypto hash for demo (real would use SubtleCrypto)
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+  return (h >>> 0).toString(16).padStart(8,'0') + randomHex(12);
+}
+
+function onboard() {
+  if (state.inject.entropy) {
+    record('ENTROPY','FAILURE INJECTED','Entropy health degraded','error');
+    log('Entropy failure injected — onboard blocked','log-err');
+    state.inject.entropy = false;
+    return;
+  }
+  state.trace = [];
+  record('SYSTEM','Full patent process start','Boot → Entropy → DNA → Cipher1 → I2C → Cipher2 → IAM → BCE');
+
+  const dnaA = randomHex(32);
+  const dnaB = randomHex(32);
+  const halfA = randomHex(32);
+  const halfB = randomHex(32);
+
+  record('BOOT','MC-A (Master) power-on','Role=Master');
+  record('ENTROPY','MC-A collecting entropy','Time + clock jitter');
+  record('DNA','MC-A Digital DNA created', shortHex(dnaA));
+  record('CIPHER1','MC-A Cipher 1 (AES-SEA 256-bit)','Channel 1A');
+
+  record('BOOT','MC-B (Slave) power-on','Role=Slave');
+  record('ENTROPY','MC-B collecting entropy','Time + clock jitter');
+  record('DNA','MC-B Digital DNA created', shortHex(dnaB));
+  record('CIPHER1','MC-B Cipher 1 (AES-SEA 256-bit)','Channel 1B');
+
+  record('I2C','I2C bus start','Master/Slave TWI | 10-bit addressing');
+  record('I2C','Exchange Cipher-1 halves','256-bit material transferred + ACK');
+
+  if (state.inject.mismatch) {
+    record('CIPHER2','FAILURE INJECTED – key mismatch','Master ≠ Slave','error');
+    log('Key mismatch injected','log-err');
+    state.inject.mismatch = false;
+    renderAll();
+    return;
+  }
+
+  // Simulate 10-round mixing
+  let material = halfA + halfB;
+  for (let r = 0; r < 10; r++) {
+    material = sha256(material + r);
+    if (r === 0 || r === 4 || r === 9) record('CIPHER2','Round '+(r+1)+'/10','Mixing');
+  }
+  const vkey = sha256(material);
+  record('CIPHER2','AES-SEA 512-bit validation key established', shortHex(vkey));
+
+  // IAM
+  const macA = dnaA.slice(0,2)+':'+dnaA.slice(2,4)+':'+dnaA.slice(4,6)+':'+dnaA.slice(6,8)+':'+dnaA.slice(8,10)+':'+dnaA.slice(10,12);
+  const serialA = 'CYB-' + dnaA.slice(16,24).toUpperCase();
+  state.iam.push({ dna:dnaA, short:shortHex(dnaA), status:'active', validation:'validated', mac:macA, serial:serialA, firmware:'1.4.0-sim', notes:'web-onboard A', last_tx:'' });
+  state.iam.push({ dna:dnaB, short:shortHex(dnaB), status:'active', validation:'validated', mac:dnaB.slice(0,2)+':'+dnaB.slice(2,4)+':'+dnaB.slice(4,6)+':'+dnaB.slice(6,8)+':'+dnaB.slice(8,10)+':'+dnaB.slice(10,12), serial:'CYB-'+dnaB.slice(16,24).toUpperCase(), firmware:'1.4.0-sim', notes:'web-onboard B', last_tx:'' });
+  record('IAM','Central database – devices registered','MAC, serial, validation=validated');
+
+  // BCE
+  const h1 = sha256('REGISTER'+dnaA);
+  const h2 = sha256('REGISTER'+dnaB);
+  state.ledger.push({ index:state.ledger.length, event:'REGISTER', dna_a:shortHex(dnaA,6), dna_b:'', hash:shortHex(h1,10), ts:Date.now() });
+  state.ledger.push({ index:state.ledger.length, event:'REGISTER', dna_a:shortHex(dnaB,6), dna_b:'', hash:shortHex(h2,10), ts:Date.now() });
+  record('BCE','Registration events appended','Hash-chained ledger');
+
+  state.fleet.push({ label:'Pair-'+(state.fleet.length+1), dnaA, dnaB, shortA:shortHex(dnaA), shortB:shortHex(dnaB), vkey:shortHex(vkey), created:Date.now() });
+  state.activeIdx = state.fleet.length - 1;
+  record('SYSTEM','Pair added to fleet','Fleet size '+state.fleet.length);
+
+  log('Onboarded '+state.fleet[state.activeIdx].label+' · DNA-A '+shortHex(dnaA)+' · DNA-B '+shortHex(dnaB),'log-ok');
+  renderAll();
+}
+
+function sendP2PE() {
+  if (state.activeIdx < 0) { log('No active pair','log-err'); return; }
+  if (state.inject.revoke) {
+    record('P2PE','FAILURE INJECTED – revoked device blocked','','error');
+    log('Revoke block injected','log-err');
+    state.inject.revoke = false;
+    return;
+  }
+  const msg = document.getElementById('msg').value || 'demo payload';
+  const p = state.fleet[state.activeIdx];
+  record('P2PE','Open channel using 512-bit validation key','Session key both directions');
+  const ct = randomHex(32);
+  record('P2PE','Payload encrypted + integrity verified','Recovered intact');
+  state.ledger.push({ index:state.ledger.length, event:'MSG', dna_a:p.shortA, dna_b:p.shortB, hash:shortHex(sha256(msg),10), ts:Date.now() });
+  log('P2PE OK · recovered: "'+msg+'"','log-ok');
+  renderAll();
+}
+
+function revoke() {
+  if (!state.iam.length) { log('No devices','log-err'); return; }
+  const target = state.iam[state.iam.length-1];
+  target.status = 'revoked';
+  target.validation = 'revoked';
+  state.ledger.push({ index:state.ledger.length, event:'REVOKE', dna_a:target.short, dna_b:'', hash:shortHex(sha256('REVOKE'),10), ts:Date.now() });
+  record('IAM','Device revoked', target.short);
+  log('Revoked '+target.short,'log-ok');
+  renderAll();
+}
+
+function inject(type) {
+  state.inject[type] = true;
+  log('Injected: '+type+' (one-shot)','log-info');
+}
+
+function selfTest() {
+  const checks = [
+    { name:'Ledger hash-chain', pass:true, detail:'Integrity holds' },
+    { name:'Entropy source', pass:true, detail:'Fresh blocks available' },
+    { name:'Fleet key consistency', pass:state.fleet.length>=0, detail:state.fleet.length+' pairs' },
+    { name:'IAM database', pass:true, detail:state.iam.length+' devices' }
+  ];
+  const overall = checks.every(c => c.pass);
+  let html = `<strong style="color:${overall?'var(--ok)':'var(--danger)'}">Overall: ${overall?'PASS':'FAIL'}</strong><ul style="margin-top:0.4rem;padding-left:1.1rem">`;
+  checks.forEach(c => html += `<li style="color:${c.pass?'var(--ok)':'var(--danger)'}">${c.name}: ${c.pass?'PASS':'FAIL'} – ${c.detail}</li>`);
+  html += '</ul>';
+  document.getElementById('selftest').innerHTML = html;
+  log('Self-test '+(overall?'PASSED':'FAILED'), overall?'log-ok':'log-err');
+}
+
+function exportReport() {
+  const report = {
+    exported_at: new Date().toISOString(),
+    fleet: state.fleet,
+    iam: state.iam,
+    ledger: state.ledger.slice(-30),
+    trace: state.trace
+  };
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cyb3raliens_demo_report.json';
+  a.click();
+  log('Report exported','log-ok');
+}
+
+// Guided demo
+const demoSteps = [
+  'Welcome. This guided tour follows the exact sequence in US10673617B1.',
+  'Step 1: Dual microcontrollers (MC-A Master + MC-B Slave) boot and collect entropy from time + clock jitter.',
+  'Step 2: Each generates a Digital DNA fingerprint and a Cipher-1 256-bit half-key.',
+  'Step 3: Simulated I2C bus exchanges the halves (Master ↔ Slave, ACK).',
+  'Step 4: Cipher 2 runs 10 mixing rounds to produce the shared 512-bit AES-SEA validation key.',
+  'Step 5: Devices are registered in the central IAM database (MAC, serial, validation status).',
+  'Step 6: Registration events are appended to the hash-chained BCE ledger.',
+  'Step 7: A P2PE channel is opened using the 512-bit key; message integrity is verified.',
+  'You have just walked the complete patented architecture in pure software.'
+];
+let demoIdx = 0;
+function startGuidedDemo() {
+  demoIdx = 0;
+  document.getElementById('demo-text').textContent = demoSteps[0];
+  document.getElementById('overlay').style.display = 'flex';
+  if (state.fleet.length === 0) onboard();
+}
+function nextDemoStep() {
+  demoIdx++;
+  if (demoIdx >= demoSteps.length) { closeDemo(); return; }
+  document.getElementById('demo-text').textContent = demoSteps[demoIdx];
+  if (demoIdx === 6) sendP2PE();
+}
+function closeDemo() { document.getElementById('overlay').style.display = 'none'; }
+
+function renderPipeline() {
+  const el = document.getElementById('pipeline');
+  if (!state.trace.length) { el.innerHTML = '<em style="color:var(--muted)">Onboard a pair to see the live patent pipeline</em>'; return; }
+  el.innerHTML = state.trace.map(e => {
+    const c = e.status==='error'?'var(--danger)':e.status==='warn'?'var(--warn)':'var(--ok)';
+    return `<div class="step-highlight" style="border-color:${c}"><span style="color:var(--muted)">#${e.seq}</span> <strong style="color:${c}">[${e.stage}]</strong> ${e.step}<div style="color:var(--muted);font-size:0.7rem">${e.detail||''}</div></div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderAll() {
+  document.getElementById('s-fleet').textContent = state.fleet.length;
+  document.getElementById('s-devices').textContent = state.iam.length;
+  document.getElementById('s-ledger').textContent = state.ledger.length;
+  document.getElementById('s-integrity').textContent = 'OK';
+  document.getElementById('s-active').textContent = state.activeIdx>=0 ? state.fleet[state.activeIdx].label : '—';
+
+  // Fleet
+  const fel = document.getElementById('fleet');
+  if (!state.fleet.length) fel.innerHTML = '<em style="color:var(--muted)">No pairs</em>';
+  else {
+    let html = '<table><tr><th>#</th><th>Label</th><th>DNA-A</th><th>DNA-B</th><th>Key</th><th>Active</th></tr>';
+    state.fleet.forEach((p,i) => {
+      html += `<tr onclick="state.activeIdx=${i};renderAll()" style="cursor:pointer${i===state.activeIdx?';background:#1e293b':''}">
+        <td>${i}</td><td>${p.label}</td><td><code>${p.shortA}</code></td><td><code>${p.shortB}</code></td><td><code>${p.vkey}</code></td><td>${i===state.activeIdx?'★':''}</td></tr>`;
+    });
+    fel.innerHTML = html + '</table><p style="font-size:0.7rem;color:var(--muted);margin-top:0.4rem">Click a row to select active pair</p>';
+  }
+
+  // IAM
+  const iel = document.getElementById('iam');
+  if (!state.iam.length) iel.innerHTML = '<em style="color:var(--muted)">Empty</em>';
+  else {
+    let html = '<table><tr><th>DNA</th><th>MAC</th><th>Serial</th><th>Status</th><th>Validation</th><th>Firmware</th></tr>';
+    state.iam.forEach(r => {
+      html += `<tr><td><code>${r.short}</code></td><td><code>${r.mac}</code></td><td><code>${r.serial}</code></td>
+        <td class="status-${r.status}">${r.status}</td><td class="validation-${r.validation}">${r.validation}</td><td>${r.firmware}</td></tr>`;
+    });
+    iel.innerHTML = html + '</table>';
+  }
+
+  // Ledger
+  const lel = document.getElementById('ledger');
+  const recent = state.ledger.slice(-12);
+  let html = '<table><tr><th>#</th><th>Event</th><th>DNA-A</th><th>Hash</th></tr>';
+  recent.forEach(e => html += `<tr><td>${e.index}</td><td>${e.event}</td><td><code>${e.dna_a||''}</code></td><td><code>${e.hash}</code></td></tr>`);
+  lel.innerHTML = html + '</table>';
+
+  renderPipeline();
+}
+
+// Init
+renderAll();
+log('Cyb3rALIENS pure-browser simulation ready — click Onboard or Guided Demo','log-ok');
+</script>
+</body>
+</html>

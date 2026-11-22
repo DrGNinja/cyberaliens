@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyb3rALIENS – IAM & Blockchain Control Plane</title>
+<style>
+  :root {
+    --bg: #0b1120;
+    --card: #111827;
+    --border: #1f2937;
+    --accent: #10b981;
+    --accent2: #3b82f6;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --ok: #34d399;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .brand h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; }
+  .brand h1 span { color: var(--accent); }
+  .brand p { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+  .pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .pill {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+  .pill.green { color: var(--ok); border-color: #065f46; background: #064e3b33; }
+  main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; display: grid; gap: 1.25rem; }
+  .hero {
+    background: linear-gradient(135deg, #0f172a, #1e3a5f);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 1.5rem 1.75rem;
+  }
+  .hero h2 { font-size: 1.15rem; margin-bottom: 0.4rem; }
+  .hero p { color: var(--muted); font-size: 0.9rem; max-width: 720px; }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+  .stat-card {
+    background: #0f172a99;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+  }
+  .stat-card .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .value { font-size: 1.6rem; font-weight: 700; color: var(--accent); margin-top: 0.15rem; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 800px) { .grid2 { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .card h3 {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.9rem;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+  button {
+    background: var(--accent2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  button:hover { opacity: 0.9; transform: translateY(-1px); }
+  button.secondary { background: #475569; }
+  button.danger { background: var(--danger); }
+  button.success { background: #059669; }
+  input[type="text"] {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: var(--text);
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    max-width: 380px;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+  }
+  #log {
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    height: 220px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+  .log-ok { color: var(--ok); }
+  .log-err { color: var(--danger); }
+  .log-info { color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  th, td { text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid #1f2937; }
+  th { color: var(--muted); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; }
+  .status-active, .validation-validated { color: var(--ok); }
+  .status-revoked, .validation-revoked { color: var(--danger); }
+  .status-registered, .validation-pending { color: var(--warn); }
+  code { font-size: 0.78rem; background: #1e293b; padding: 0.1rem 0.3rem; border-radius: 4px; }
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  .value-prop {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .vp {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.82rem;
+  }
+  .vp strong { color: var(--accent); display: block; margin-bottom: 0.25rem; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Cyb3r<span>ALIENS</span> Control Plane</h1>
+    <p>Identity Access Management · Point-to-Point Encryption · Blockchain Ecosystem</p>
+  </div>
+  <div class="pills">
+    <span class="pill green">US10673617B1 Architecture</span>
+    <span class="pill">Pure Software Simulation</span>
+    <span class="pill">Investor Demo Mode</span>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>Hardware-rooted device identity + encrypted channels + immutable ledger</h2>
+    <p>
+      This live simulation demonstrates the patented dual-microcontroller architecture:
+      entropy-derived Digital DNA, AES-SEA style 512-bit validation keys, point-to-point encryption,
+      central IAM registration, and a blockchain-style event ledger — all running in pure software
+      so investors can see the complete system behavior without physical hardware.
+    </p>
+    <div class="stats">
+      <div class="stat-card"><div class="label">Total Devices</div><div class="value" id="s-total">–</div></div>
+      <div class="stat-card"><div class="label">Active</div><div class="value" id="s-active">–</div></div>
+      <div class="stat-card"><div class="label">Revoked</div><div class="value" id="s-revoked">–</div></div>
+      <div class="stat-card"><div class="label">Ledger Entries</div><div class="value" id="s-ledger">–</div></div>
+      <div class="stat-card"><div class="label">Integrity</div><div class="value" id="s-integrity">–</div></div>
+      <div class="stat-card"><div class="label">Active Pair</div><div class="value" id="s-pair">–</div></div>
+    </div>
+    <div class="value-prop">
+      <div class="vp"><strong>Digital DNA</strong> Unique, non-clonable device identity derived from hardware entropy.</div>
+      <div class="vp"><strong>Dual-MC P2PE</strong> Master/Slave microcontrollers exchange 256-bit halves → 512-bit session material.</div>
+      <div class="vp"><strong>Central IAM</strong> Register, validate, authorize and revoke devices with full audit trail.</div>
+      <div class="vp"><strong>BCE Ledger</strong> Hash-chained immutable log of every registration, channel and revocation event.</div>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Demonstrate the System</h3>
+      <div class="actions">
+        <button class="success" onclick="doOnboard()">① Onboard Dual-MC Pair</button>
+        <button onclick="doP2PE()">② Send Encrypted Message</button>
+        <button class="danger" onclick="doRevoke()">③ Revoke Device</button>
+        <button class="secondary" onclick="refreshAll()">Refresh</button>
+        <button onclick="doSelfTest()">Self-Test</button>
+        <button class="secondary" onclick="doExport()">Export Report</button>
+      </div>
+      <div class="actions" style="margin-top:0.5rem">
+        <button class="secondary" onclick="doInject('entropy')">Inject Entropy Fail</button>
+        <button class="secondary" onclick="doInject('mismatch')">Inject Key Mismatch</button>
+        <button class="secondary" onclick="doInject('revoke')">Inject Revoke Block</button>
+      </div>
+      <input type="text" id="msg-input" value="Investor demo: secure payload from Device-A" placeholder="Message to encrypt over P2PE">
+      <p style="margin-top:0.75rem;font-size:0.78rem;color:var(--muted)">
+        Step 1 creates two virtual devices with Digital DNA, MAC, serial and registers them in IAM + BCE.
+        Step 2 opens a P2PE channel and proves end-to-end integrity. Step 3 revokes a device and updates the ledger.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Live Event Log</h3>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  
+  <div class="card">
+    <h3>Patent Process Pipeline (Live Trace)</h3>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem">
+      Every stage below maps to the sequence in US10673617B1: Boot → Entropy → DNA → Cipher 1 → I2C → Cipher 2 (10 rounds) → IAM Central DB → BCE Ledger → P2PE.
+    </p>
+    <div id="pipeline" style="font-family:ui-monospace,monospace;font-size:0.78rem;max-height:320px;overflow-y:auto;background:#020617;border-radius:8px;padding:0.75rem;border:1px solid #1e293b">
+      <em style="color:var(--muted)">Run “Onboard Dual-MC Pair” to populate the live process trace…</em>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Fleet of Dual-MC Pairs</h3>
+    <div id="fleet-table"><em style="color:var(--muted)">No pairs yet</em></div>
+  </div>
+
+  <div class="card">
+    <h3>Self-Test Report</h3>
+    <div id="selftest-result"><em style="color:var(--muted)">Click Self-Test to run integrity, entropy, key, and IAM checks</em></div>
+  </div>
+
+  <div class="card">
+    <h3>IAM Central Database — Registered IoT Devices</h3>
+    <div id="iam-table"><em style="color:var(--muted)">No devices yet — click “Onboard Dual-MC Pair”</em></div>
+  </div>
+
+  <div class="card">
+    <h3>Blockchain Ecosystem (BCE) — Recent Ledger Events</h3>
+    <div id="ledger-table"><em style="color:var(--muted)">Empty</em></div>
+  </div>
+</main>
+
+<footer>
+  Architectural simulation of US Patent 10,673,617 B1 · Educational / research use · Not a commercial product implementation
+</footer>
+
+<script>
+const logEl = document.getElementById('log');
+function log(msg, cls = 'log-info') {
+  const line = document.createElement('div');
+  line.className = cls;
+  line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: {} };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const r = await fetch('/api/' + path, opts);
+  return r.json();
+}
+
+async function refreshStatus() {
+  const s = await api('status');
+  document.getElementById('s-total').textContent = s.iam_devices ?? '–';
+  document.getElementById('s-active').textContent = s.active_devices ?? '–';
+  document.getElementById('s-revoked').textContent = s.revoked_devices ?? '–';
+  document.getElementById('s-ledger').textContent = s.ledger_entries ?? '–';
+  document.getElementById('s-integrity').textContent = s.ledger_integrity ? 'OK' : 'BROKEN';
+  document.getElementById('s-pair').textContent = s.has_active_pair ? 'Yes' : 'No';
+}
+
+async function refreshIAM() {
+  const d = await api('iam');
+  if (!d.devices || !d.devices.length) {
+    document.getElementById('iam-table').innerHTML = '<em style="color:var(--muted)">No devices yet</em>';
+    return;
+  }
+  let html = `<table>
+    <tr>
+      <th>DNA (short)</th><th>MAC</th><th>Serial</th><th>Status</th>
+      <th>Validation</th><th>Firmware</th><th>Last Tx</th>
+    </tr>`;
+  for (const r of d.devices) {
+    html += `<tr>
+      <td><code>${r.dna_short || ''}</code></td>
+      <td><code>${r.mac || '—'}</code></td>
+      <td><code>${r.serial || '—'}</code></td>
+      <td class="status-${r.status}">${r.status}</td>
+      <td class="validation-${r.validation}">${r.validation || '—'}</td>
+      <td>${r.firmware || '—'}</td>
+      <td><code>${(r.last_tx || '').slice(0,12) || '—'}</code></td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('iam-table').innerHTML = html;
+}
+
+async function refreshLedger() {
+  const d = await api('ledger');
+  if (!d.entries || !d.entries.length) {
+    document.getElementById('ledger-table').innerHTML = '<em style="color:var(--muted)">Empty</em>';
+    return;
+  }
+  let html = `<table>
+    <tr><th>#</th><th>Event</th><th>DNA-A</th><th>DNA-B</th><th>Hash</th></tr>`;
+  for (const e of d.entries) {
+    html += `<tr>
+      <td>${e.index}</td>
+      <td>${e.event}</td>
+      <td><code>${e.dna_a || ''}</code></td>
+      <td><code>${e.dna_b || '—'}</code></td>
+      <td><code>${e.hash || ''}</code></td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('ledger-table').innerHTML = html;
+}
+
+
+async function refreshPipeline() {
+  try {
+    const d = await api('trace');
+    const el = document.getElementById('pipeline');
+    if (!d.events || !d.events.length) {
+      el.innerHTML = '<em style="color:var(--muted)">No process events yet</em>';
+      return;
+    }
+    let html = '';
+    for (const e of d.events) {
+      const color = e.status === 'error' ? 'var(--danger)' : e.status === 'warn' ? 'var(--warn)' : 'var(--ok)';
+      html += `<div style="margin-bottom:0.35rem;border-left:3px solid ${color};padding-left:0.6rem">
+        <span style="color:var(--muted)">#${e.seq}</span>
+        <strong style="color:${color}">[${e.stage}]</strong>
+        ${e.step}
+        <div style="color:var(--muted);font-size:0.72rem">${e.detail || ''}</div>
+      </div>`;
+    }
+    el.innerHTML = html;
+    el.scrollTop = el.scrollHeight;
+  } catch (e) {
+    log('Pipeline error: ' + e.message, 'log-err');
+  }
+}
+
+async function refreshAll() {
+  try {
+    await refreshStatus();
+    await refreshIAM();
+    await refreshLedger();
+    await refreshPipeline();
+    await refreshFleet();
+    log('Dashboard refreshed', 'log-info');
+  } catch (e) { log('Refresh error: ' + e.message, 'log-err'); }
+}
+
+async function doOnboard() {
+  log('Creating dual-MC pair + Digital DNA + IAM registration…', 'log-info');
+  try {
+    const r = await api('onboard', 'POST');
+    if (r.status === 'ok') {
+      log('DNA-A: ' + r.dna_a_short + '  |  DNA-B: ' + r.dna_b_short, 'log-ok');
+      log('512-bit validation key established: ' + r.validation_key, 'log-ok');
+      log('Devices registered in IAM central database and written to BCE ledger', 'log-ok');
+    } else log('Onboard failed', 'log-err');
+    await refreshAll();
+  } catch (e) { log('Onboard error: ' + e.message, 'log-err'); }
+}
+
+async function doP2PE() {
+  const msg = document.getElementById('msg-input').value || 'Investor demo payload';
+  log('Opening P2PE channel and sending: "' + msg + '"', 'log-info');
+  try {
+    const r = await api('p2pe', 'POST', { message: msg });
+    if (r.integrity) {
+      log('Message recovered intact: "' + r.recovered + '"', 'log-ok');
+      log('End-to-end P2PE integrity verified ✓', 'log-ok');
+    } else log('Integrity check FAILED', 'log-err');
+    await refreshAll();
+  } catch (e) { log('P2PE error: ' + e.message, 'log-err'); }
+}
+
+async function doSelfTest() {
+  log('Running system self-test…', 'log-info');
+  try {
+    const r = await api('selftest');
+    const el = document.getElementById('selftest-result');
+    let html = `<strong style="color:${r.overall ? 'var(--ok)' : 'var(--danger)'}">Overall: ${r.overall ? 'PASS' : 'FAIL'}</strong><ul style="margin-top:0.5rem;padding-left:1.2rem">`;
+    for (const c of r.checks || []) {
+      html += `<li style="color:${c.pass ? 'var(--ok)' : 'var(--danger)'}">${c.name}: ${c.pass ? 'PASS' : 'FAIL'} – ${c.detail}</li>`;
+    }
+    html += '</ul>';
+    el.innerHTML = html;
+    log('Self-test ' + (r.overall ? 'PASSED' : 'FAILED'), r.overall ? 'log-ok' : 'log-err');
+    await refreshAll();
+  } catch (e) { log('Self-test error: ' + e.message, 'log-err'); }
+}
+
+async function doExport() {
+  log('Generating demo report…', 'log-info');
+  try {
+    const r = await fetch('/api/export');
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cyb3raliens_demo_report.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    log('Report downloaded', 'log-ok');
+  } catch (e) { log('Export error: ' + e.message, 'log-err'); }
+}
+
+async function doInject(type) {
+  log('Injecting failure: ' + type, 'log-info');
+  try {
+    const r = await api('inject', 'POST', { type });
+    log(r.note || r.message || 'Injected', r.status === 'ok' ? 'log-ok' : 'log-err');
+  } catch (e) { log('Inject error: ' + e.message, 'log-err'); }
+}
+
+async function refreshFleet() {
+  try {
+    const d = await api('fleet');
+    const el = document.getElementById('fleet-table');
+    if (!d.pairs || !d.pairs.length) {
+      el.innerHTML = '<em style="color:var(--muted)">No pairs yet</em>';
+      return;
+    }
+    let html = '<table><tr><th>#</th><th>Label</th><th>DNA-A</th><th>DNA-B</th><th>Key</th><th>Active</th></tr>';
+    for (const p of d.pairs) {
+      html += `<tr>
+        <td>${p.index}</td>
+        <td>${p.label}</td>
+        <td><code>${p.dna_a_short}</code></td>
+        <td><code>${p.dna_b_short}</code></td>
+        <td><code>${p.validation_key}</code></td>
+        <td>${p.active ? '★' : ''}</td>
+      </tr>`;
+    }
+    html += '</table>';
+    el.innerHTML = html;
+  } catch (e) { log('Fleet error: ' + e.message, 'log-err'); }
+}
+  log('Revoking most recent device…', 'log-info');
+  try {
+    const r = await api('revoke', 'POST');
+    if (r.status === 'ok') {
+      log('Device revoked: ' + r.revoked + ' — status updated in IAM + BCE', 'log-ok');
+    } else log(r.message || 'Revoke failed', 'log-err');
+    await refreshAll();
+  } catch (e) { log('Revoke error: ' + e.message, 'log-err'); }
+}
+
+refreshAll();
+log('Cyb3rALIENS investor demo ready — start with “Onboard Dual-MC Pair”', 'log-ok');
+</script>
+</body>
+</html>
