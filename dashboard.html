@@ -8,40 +8,36 @@
   :root { color-scheme: dark; --bg:#07110e; --surface:#101916; --surface-2:#18241f; --fg:#e7f0ea; --muted:#8ea399; --line:#24332c; --signal:#3ddc97; --signal-dim:#14382a; --alert:#e2b340; --alert-dim:#3a3014; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 ui-sans-serif, system-ui, sans-serif; }
-  header, main, footer { max-width:1180px; margin:0 auto; padding:16px; }
-  header { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; align-items:flex-end; }
+  header, main, footer { max-width:1100px; margin:0 auto; padding:16px; }
+  header { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  h1 { margin:6px 0; font-size:28px; letter-spacing:-.02em; }
+  h2 { margin:0 0 8px; font-size:16px; }
   a { color:var(--signal); }
   .kicker { margin:0; font:12px/1 ui-monospace, monospace; letter-spacing:.14em; color:var(--signal); }
-  h1 { margin:6px 0; font-size:28px; letter-spacing:-.02em; }
-  h2 { margin:0 0 8px; font-size:15px; }
   .muted { color:var(--muted); }
-  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  button { font:inherit; min-height:44px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2); color:var(--fg); padding:0 14px; cursor:pointer; }
-  button.solid { background:var(--signal); color:#07110e; border-color:var(--signal); font-weight:600; }
-  .now { margin-top:8px; min-height:3.2em; max-width:46rem; }
-  .layout { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(16rem,.85fr); gap:12px; }
+  button, select, input { font:inherit; color:var(--fg); }
+  button { min-height:44px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2); padding:0 14px; cursor:pointer; }
+  button.solid { background:var(--signal); color:#07110e; border:0; font-weight:650; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  input, select { min-height:44px; border-radius:12px; border:1px solid var(--line); background:#0c1612; padding:0 12px; }
+  .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:12px; }
   .card { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:14px; }
-  .fleet { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .devices { display:grid; gap:8px; }
   .device { text-align:left; width:100%; border-radius:14px; padding:12px; background:#0c1612; }
   .device.on { border-color:var(--signal); }
-  .device.stop { border-color:var(--alert); }
+  .device.bad { border-color:var(--alert); }
   .device strong { display:block; }
-  .lamps { display:flex; gap:4px; margin-top:8px; }
-  .lamps i { width:8px; height:8px; border-radius:99px; background:var(--line); display:block; }
-  .lamps i.on { background:var(--signal); }
-  .lamps i.stop { background:var(--alert); }
-  .stack { display:grid; gap:6px; margin-top:8px; }
-  .step { display:flex; justify-content:space-between; gap:8px; border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:14px; }
-  .step.on { border-color:var(--signal); background:var(--signal-dim); }
-  .step.stop { border-color:var(--alert); background:var(--alert-dim); }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .steps { display:grid; gap:6px; margin:8px 0; }
+  .step { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:14px; display:flex; justify-content:space-between; gap:8px; }
+  .step.now { border-color:var(--signal); background:var(--signal-dim); }
+  .step.done { color:var(--signal); }
+  .msg { white-space:pre-wrap; font:14px/1.45 ui-monospace, monospace; background:#0c1612; border-radius:12px; padding:10px; min-height:4.5em; }
   table { width:100%; border-collapse:collapse; font-size:13px; }
   th, td { text-align:left; padding:6px 4px; border-bottom:1px solid var(--line); vertical-align:top; }
   th { color:var(--muted); font-weight:500; }
-  .channel { margin-top:8px; font:13px/1.4 ui-monospace, monospace; }
-  .housings { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-  .housings span { border:1px solid var(--line); border-radius:99px; padding:4px 10px; font-size:12px; color:var(--muted); }
   footer { font-size:12px; color:var(--muted); }
-  @media (max-width:860px) { .layout, .fleet { grid-template-columns:1fr; } }
+  @media (max-width:860px) { .grid { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
@@ -49,180 +45,164 @@
   <div>
     <p class="kicker">U.S. PATENT 10,673,617 B1</p>
     <h1>The system</h1>
-    <p class="muted" style="margin:0;max-width:40rem">Watch one network. A step lights only after it happens. A device earns a name only after it earns it.</p>
+    <p class="muted" style="margin:0;max-width:40rem">Register a device yourself. The identity stays with those chips. Then send a message you write.</p>
   </div>
-  <div class="row">
-    <a href="index.html">All demonstrations</a>
-    <button id="back" type="button">Back</button>
-    <button class="solid" id="pause" type="button">Pause</button>
-    <button id="next" type="button">Next</button>
-    <button id="replay" type="button">Replay</button>
-  </div>
+  <a href="index.html">All demonstrations</a>
 </header>
 <main>
-  <p class="now"><span class="kicker" id="beat-name"></span><br><strong id="beat-plain"></strong><br><span class="muted" id="beat-copy"></span></p>
-  <section class="card" id="records">
-    <div class="layout">
-      <div>
-        <h2>Who is allowed to speak</h2>
-        <table id="iam"><thead><tr><th>Device</th><th>Identity</th><th>Decision</th></tr></thead><tbody></tbody></table>
-      </div>
-      <div>
-        <h2>The record</h2>
-        <table id="ledger"><thead><tr><th>Block</th><th>What was written</th><th>Check</th></tr></thead><tbody></tbody></table>
-      </div>
-    </div>
-  </section>
-  <div class="layout" style="margin-top:12px">
+  <div class="grid">
     <section class="card">
       <h2>Devices</h2>
-      <div class="fleet" id="fleet"></div>
-      <div class="channel" id="channel"></div>
-      <p class="muted" style="font-size:12px;margin:8px 0 0">Each dot is one step. It lights only when that step has happened.</p>
-      <div class="housings">
-        <span>Dock</span><span>Computer card</span><span>Adapter</span><span>Pulse-generator can</span><span>Voting terminal</span>
-      </div>
-      <p class="muted" style="font-size:12px;margin:8px 0 0">The same two chips fit each of these. This run uses the cars and one dock.</p>
+      <div class="devices" id="devices"></div>
     </section>
     <section class="card">
-      <h2 id="focus-name">Device</h2>
-      <div class="stack" id="stack"></div>
+      <h2 id="action-title">Start with one device</h2>
+      <p class="muted" id="action-copy"></p>
+      <div id="action"></div>
     </section>
   </div>
+  <section class="card" style="margin-top:12px">
+    <h2>What just happened</h2>
+    <div class="msg" id="result">Choose Register on Vehicle A. Nothing is enrolled until you do.</div>
+  </section>
+  <section class="card" style="margin-top:12px">
+    <h2>Identities in this session</h2>
+    <table id="book"><thead><tr><th>Device</th><th>Identity</th><th>State</th></tr></thead><tbody></tbody></table>
+  </section>
 </main>
-<footer>Simulation of the published method for a meeting. Not a patent license and not the production chip. The zero-knowledge proof is shown as the patent describes it: the prover does not unveil the secret, and the verifier accepts or refuses the proof.</footer>
+<footer>A session you drive. Identities are created when you register and are not the production chip. The scrambled line simulates encryption. It is not the production AES-SEA output. Not a patent license.</footer>
 <script>
-const layers = [
-  ["i2c", "The two chips", "Connected. One leads, one answers."],
-  ["c1", "First key", "Two different halves, one from each chip."],
-  ["c2", "The 512-bit key", "The halves are mixed ten times."],
-  ["pki", "Certificate", "Issued so the key can be trusted."],
-  ["dna", "Fingerprint", "Network address, serial number, fingerprint."],
-  ["db", "Permission", "The server decides who may speak."],
-  ["chain", "Record", "This entry points to the one before it."],
-  ["zkp", "Proof", "The secret is not shown."],
-  ["p2pe", "Private message", "Allowed only after the record."]
+const steps = [
+  ["The two chips", "MC (A) leads. MC (B) answers. They join on I2C."],
+  ["First key", "Each chip prepares a different 256-bit half."],
+  ["The 512-bit key", "The halves mix for ten rounds. One validation key exists."],
+  ["Certificate", "AES-2048 places a certificate on that key."],
+  ["Fingerprint", "The network address, serial number, and fingerprint are collected."],
+  ["The record", "The server writes the identity. It is not issued again."]
 ];
-const blank = () => Object.fromEntries(layers.map(([id]) => [id, "off"]));
-const devices = {
-  a: { name: "Vehicle A", role: "Car", note: "On the network", stage: blank() },
-  b: { name: "Vehicle B", role: "Car", note: "On the network", stage: blank() },
-  c: { name: "Vehicle C", role: "Car", note: "On the network", stage: blank() },
-  d: { name: "Unit D", role: "Dock", note: "On the network", stage: blank() }
-};
-let focus = "a";
-let beat = 0;
-let playing = true;
-let last = performance.now();
-let local = 0;
+const housings = ["Car", "Dock", "Computer", "Pulse-generator can", "Voting terminal"];
+function hex(n) {
+  const b = new Uint8Array(n);
+  crypto.getRandomValues(b);
+  return [...b].map(x => x.toString(16).padStart(2, "0")).join("");
+}
+function mac() {
+  return hex(6).match(/.{2}/g).join(":").toUpperCase();
+}
+function scramble(text) {
+  const bytes = new TextEncoder().encode(text);
+  return [...bytes].map((b, i) => (b ^ (0x5a + i)).toString(16).padStart(2, "0")).join(" ");
+}
+const devices = ["Vehicle A", "Vehicle B", "Vehicle C"].map(name => ({
+  name, housing: "Car", status: "clear", identity: null, step: -1
+}));
+let selected = 0;
+let draft = "";
 
-function light(id, key, value) { devices[id].stage[key] = value; }
-
-const beats = [
-  { name: "Dark fleet", plain: "Nothing here is allowed to talk yet.", ms: 5000, focus: "a", copy: "Three vehicles and one dock. No chip has joined. No channel is open.", run() {} },
-  { name: "I2C", plain: "The two chips inside the first car wake up and connect to each other.", ms: 6000, focus: "a", copy: "Vehicle A. MC (A) is master. MC (B) is slave. They join on I2C.", run() { light("a", "i2c", "on"); } },
-  { name: "Cipher 1", plain: "Each chip prepares its own half of the key. The halves are not the same.", ms: 7000, focus: "a", copy: "Channel 1A and channel 1B each carry a different AES-SEA 256-bit key. The timer feeds the clock.", run() { light("a", "c1", "on"); } },
-  { name: "Cipher 2", plain: "The two halves are mixed ten times. Now there is one key.", ms: 7000, focus: "a", copy: "Ten rounds. The AES-SEA 512-bit validation key now exists.", run() { light("a", "c2", "on"); } },
-  { name: "Certificate", plain: "A certificate is issued so later steps can trust this key.", ms: 5500, focus: "a", copy: "The 512-bit key is sent to the PKI server. AES-2048 places the certificate.", run() { light("a", "pki", "on"); } },
-  { name: "Identity", plain: "The car gets an identity: a network address, a serial number, and a fingerprint.", ms: 7000, focus: "a", copy: "IAM collects the MAC address, the serial number, and the fingerprint. The central server marks Vehicle A registered.", run() { light("a", "dna", "on"); light("a", "db", "on"); devices.a.role = "Registered"; devices.a.note = "Identity on file"; } },
-  { name: "Ledger", plain: "That identity is written down in a record that points back to the one before it.", ms: 6000, focus: "a", copy: "A block is written. It carries the hash of the previous block. A DApp channel links IAM to the ledger.", run() { light("a", "chain", "on"); } },
-  { name: "Second device", plain: "The second car does the same thing. It is now able to check the first.", ms: 7000, focus: "b", copy: "Vehicle B completes the same stack. Same chips. Same method. It can now verify.", run() { ["i2c","c1","c2","pki","dna","db","chain"].forEach(k => light("b", k, "on")); devices.b.role = "Registered"; devices.b.note = "Identity on file"; } },
-  { name: "Zero-knowledge proof", plain: "The first car proves it holds the secret without showing the secret.", ms: 8000, focus: "a", copy: "Vehicle A is the prover. Vehicle B is the verifier. The secret is not unveiled. The proof is accepted.", run() { light("a", "zkp", "on"); light("b", "zkp", "on"); devices.a.role = "Proves"; devices.b.role = "Checks"; } },
-  { name: "P2PE", plain: "Only now are the two cars allowed to exchange one private message.", ms: 7000, focus: "a", copy: "Both devices have a record. One packet crosses on the 512-bit key.", run() { light("a", "p2pe", "on"); light("b", "p2pe", "on"); devices.a.note = "Speaking"; devices.b.note = "Speaking"; } },
-  { name: "Refused", plain: "A third car is visible. It has no identity, so it is not allowed to speak.", ms: 7000, focus: "c", copy: "Vehicle C is seen by the central server. It has no record. The channel is refused. A firewall did not make this decision.", run() { light("c", "db", "stop"); devices.c.role = "Refused"; devices.c.note = "No identity on file"; } },
-  { name: "Unfinished", plain: "If the chips do not finish talking, the key is never made and nothing after it happens.", ms: 8000, focus: "d", copy: "Unit D, on a dock. Channel 1B does not return. TXCOMP is not set. Cipher 2 does not run. No key, no identity, no block, no channel.", run() { light("d", "i2c", "on"); light("d", "c1", "stop"); devices.d.role = "Stopped"; devices.d.note = "The chips did not finish"; } }
-];
-
-let painted = "";
+function label(d) {
+  if (d.status === "registered") return "Registered · " + d.housing;
+  if (d.status === "forfeit") return "Forfeit · chips no longer match";
+  if (d.status === "untrusted") return "Untrusted · not in the ecosystem";
+  if (d.status === "registering") return "Registering · " + d.housing;
+  return "Not registered · " + d.housing;
+}
 function render() {
-  const current = beats[beat];
-  const signature = beat + "|" + focus + "|" + playing + "|" + JSON.stringify(Object.values(devices).map(d => d.stage));
-  document.getElementById("pause").textContent = playing ? "Pause" : "Play";
-  if (signature === painted) return;
-  painted = signature;
-  document.getElementById("beat-name").textContent = current.name + " · " + (beat + 1) + " / " + beats.length;
-  document.getElementById("beat-plain").textContent = current.plain;
-  document.getElementById("beat-copy").textContent = current.copy;
-  document.getElementById("pause").textContent = playing ? "Pause" : "Play";
-  document.getElementById("fleet").innerHTML = Object.entries(devices).map(([id, device]) => {
-    const lamps = layers.map(([key]) => '<i class="' + device.stage[key] + '"></i>').join("");
-    const edge = Object.values(device.stage).includes("stop") ? "stop" : Object.values(device.stage).includes("on") ? "on" : "";
-    return '<button type="button" class="device ' + edge + '" data-id="' + id + '"><strong>' + device.name + '</strong><span class="muted">' + device.role + " · " + device.note + '</span><span class="lamps">' + lamps + '</span></button>';
+  document.getElementById("devices").innerHTML = devices.map((d, i) => {
+    const edge = d.status === "registered" ? "on" : (d.status === "forfeit" || d.status === "untrusted" ? "bad" : "");
+    return '<button type="button" class="device ' + edge + '" data-i="' + i + '"><strong>' + d.name + '</strong><span class="muted">' + label(d) + '</span></button>';
   }).join("");
-  document.querySelectorAll(".device").forEach(button => button.onclick = () => { focus = button.dataset.id; playing = false; render(); });
-  const device = devices[focus];
-  document.getElementById("focus-name").textContent = device.name + " · " + device.role;
-  document.getElementById("stack").innerHTML = layers.map(([key, title, detail]) =>
-    '<div class="step ' + device.stage[key] + '"><span>' + title + '</span><span class="muted">' + (device.stage[key] === "off" ? "Not yet" : device.stage[key] === "stop" ? "Stopped" : detail) + '</span></div>'
-  ).join("");
-  const iam = [];
-  if (devices.a.stage.db === "on") iam.push(["Vehicle A", "A4:19:C0:11:7E:02 · CYB-A-1044 · 7F3A…C91E", "May speak"]);
-  if (devices.b.stage.db === "on") iam.push(["Vehicle B", "B8:22:11:90:04:C3 · CYB-B-2281 · 91D0…44AA", "May speak"]);
-  if (devices.c.stage.db === "stop") iam.push(["Vehicle C", "Seen. No fingerprint on file.", "May not speak"]);
-  document.querySelector("#iam tbody").innerHTML = iam.map(row => "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td></tr>").join("") || "<tr><td colspan='3' class='muted'>No identity yet</td></tr>";
-  const ledger = [];
-  if (devices.a.stage.chain === "on") ledger.push(["1", "Vehicle A registered", "Points to the start"]);
-  if (devices.b.stage.chain === "on") ledger.push(["2", "Vehicle B registered", "Points to block 1"]);
-  if (devices.a.stage.zkp === "on") ledger.push(["Proof", "A proves to B", "Secret not shown"]);
-  if (devices.a.stage.p2pe === "on") ledger.push(["Message", "Passing on your left.", "Read back intact"]);
-  document.querySelector("#ledger tbody").innerHTML = ledger.map(row => "<tr><td>" + row[0] + "</td><td>" + row[1] + "</td><td>" + row[2] + "</td></tr>").join("") || "<tr><td colspan='3' class='muted'>No block yet</td></tr>";
-  const channel = document.getElementById("channel");
-  const said = [];
-  if (devices.a.stage.p2pe === "on") said.push('Vehicle A sent "Passing on your left." Vehicle B read the same words back.');
-  if (devices.c.stage.db === "stop") said.push("Vehicle C asked to speak and was refused.");
-  if (devices.d.stage.c1 === "stop") said.push("Unit D stopped before a key existed.");
-  channel.textContent = said.join(" ") || "No message yet.";
-}
-
-const opening = {
-  a: ["Car", "On the network"],
-  b: ["Car", "On the network"],
-  c: ["Car", "On the network"],
-  d: ["Dock", "On the network"]
-};
-function restoreNames() {
-  Object.entries(opening).forEach(([id, pair]) => { devices[id].role = pair[0]; devices[id].note = pair[1]; });
-}
-function reset() {
-  Object.values(devices).forEach(device => { device.stage = blank(); });
-  restoreNames();
-  focus = "a"; beat = 0; local = 0; playing = true; painted = "";
-  beats[0].run();
-  render();
-}
-function go(next) {
-  if (next < 0 || next >= beats.length) return;
-  playing = false;
-  beat = next;
-  local = 0;
-  Object.values(devices).forEach(device => { device.stage = blank(); });
-  restoreNames();
-  for (let i = 0; i <= beat; i++) beats[i].run();
-  focus = beats[beat].focus;
-  painted = "";
-  render();
-}
-document.getElementById("pause").onclick = () => { playing = !playing; painted = ""; render(); };
-document.getElementById("replay").onclick = reset;
-document.getElementById("back").onclick = () => go(beat - 1);
-document.getElementById("next").onclick = () => go(beat + 1);
-function tick(now) {
-  const dt = Math.min(80, now - last); last = now;
-  if (playing) {
-    local += dt;
-    if (local >= beats[beat].ms) {
-      local = 0;
-      beat = (beat + 1) % beats.length;
-      if (beat === 0) { Object.values(devices).forEach(device => { device.stage = blank(); }); restoreNames(); }
-      beats[beat].run();
-      focus = beats[beat].focus;
-    }
+  document.querySelectorAll(".device").forEach(b => b.onclick = () => { selected = Number(b.dataset.i); render(); });
+  const d = devices[selected];
+  const title = document.getElementById("action-title");
+  const copy = document.getElementById("action-copy");
+  const box = document.getElementById("action");
+  if (d.status === "registering") {
+    title.textContent = "Register " + d.name;
+    copy.textContent = "This follows the patent in order. The identity is written only on the last step.";
+    box.innerHTML = '<div class="steps">' + steps.map((s, i) => '<div class="step ' + (i < d.step ? "done" : i === d.step ? "now" : "") + '"><span>' + s[0] + '</span><span class="muted">' + (i === d.step ? s[1] : i < d.step ? "Done" : "Not yet") + '</span></div>').join("") + '</div><div class="row"><button class="solid" id="advance" type="button">' + (d.step === steps.length - 1 ? "Write the record" : "Next step") + '</button><button id="fail" type="button">The chips do not finish</button></div>';
+    document.getElementById("advance").onclick = advance;
+    document.getElementById("fail").onclick = failRegistration;
+  } else {
+    const registered = devices.filter(x => x.status === "registered");
+    title.textContent = registered.length < 2 ? "Register two devices" : "Send a message you write";
+    copy.textContent = "The identity stays with the chips that created it. Moving those chips forfeits the device.";
+    const options = devices.map((x, i) => '<option value="' + i + '">' + x.name + '</option>').join("");
+    box.innerHTML = '<div class="row"><button class="solid" id="begin" type="button">Register ' + d.name + '</button></div>'
+      + '<div class="row" style="margin-top:10px"><select id="from">' + options + '</select><select id="to">' + options + '</select><input id="text" placeholder="Type a message"></div>'
+      + '<div class="row" style="margin-top:8px"><button id="send" type="button">Send privately</button><button id="move" type="button">Move these chips</button></div>'
+      + '<div class="row" style="margin-top:8px"><span class="muted">Move into</span><select id="housing">' + housings.map(h => '<option>' + h + '</option>').join("") + '</select></div>';
+    document.getElementById("to").selectedIndex = selected === 0 ? 1 : 0;
+    document.getElementById("from").selectedIndex = selected;
+    document.getElementById("text").value = draft;
+    document.getElementById("text").oninput = e => { draft = e.target.value; };
+    document.getElementById("begin").onclick = begin;
+    document.getElementById("send").onclick = send;
+    document.getElementById("move").onclick = moveChips;
   }
-  render();
-  requestAnimationFrame(tick);
+  document.querySelector("#book tbody").innerHTML = devices.map(x => "<tr><td>" + x.name + "</td><td>" + (x.identity ? x.identity.mac + " · " + x.identity.serial + " · " + x.identity.dna : "None") + "</td><td>" + label(x) + "</td></tr>").join("");
 }
-reset();
-requestAnimationFrame(tick);
+function say(text) { document.getElementById("result").textContent = text; }
+function begin() {
+  const d = devices[selected];
+  if (d.status === "registered" || d.status === "forfeit") {
+    say(d.name + " already has an identity. It is not issued a second time. The identity stays with these chips for life.");
+    return;
+  }
+  d.status = "registering";
+  d.step = 0;
+  say(d.name + " is enrolling. Nothing is written until the last step.");
+  render();
+}
+function advance() {
+  const d = devices[selected];
+  if (d.step < steps.length - 1) { d.step += 1; render(); return; }
+  d.status = "registered";
+  d.identity = { mac: mac(), serial: "CYB-" + hex(2).toUpperCase(), dna: hex(2).toUpperCase() + "…" + hex(2).toUpperCase() };
+  d.step = -1;
+  say(d.name + " is registered.\nAddress " + d.identity.mac + "\nSerial " + d.identity.serial + "\nFingerprint " + d.identity.dna + "\nThis identity will not be issued again, and these chips cannot be moved to another device.");
+  render();
+}
+function failRegistration() {
+  const d = devices[selected];
+  d.status = "clear";
+  d.step = -1;
+  d.identity = null;
+  say("The return between the chips did not finish. No 512-bit key was made. No identity was written. " + d.name + " is still not registered.");
+  render();
+}
+function send() {
+  draft = document.getElementById("text").value;
+  const from = devices[Number(document.getElementById("from").value)];
+  const to = devices[Number(document.getElementById("to").value)];
+  if (!draft.trim()) { say("Type a message first."); return; }
+  if (from === to) { say("Choose two different devices."); return; }
+  const blocked = [from, to].filter(d => d.status !== "registered");
+  if (blocked.length) {
+    blocked.forEach(d => { if (d.status !== "forfeit") d.status = "untrusted"; });
+    say(blocked.map(d => d.name).join(" and ") + " may not use the private channel. The message was refused and the device is marked untrusted. It is visible, and it is not in the ecosystem.");
+    render();
+    return;
+  }
+  say("From " + from.name + "\nYou wrote: " + draft.trim() + "\nOn the channel it travels as:\n" + scramble(draft.trim()) + "\n" + to.name + " reads back: " + draft.trim());
+}
+function moveChips() {
+  const d = devices[selected];
+  const housing = document.getElementById("housing").value;
+  if (d.status !== "registered" && d.status !== "forfeit") {
+    say("Register " + d.name + " first. Chips that were never enrolled have no identity to forfeit.");
+    return;
+  }
+  if (housing === d.housing && d.status === "registered") {
+    say("Those chips are already in the " + d.housing + ". Choose a different device.");
+    return;
+  }
+  const previous = d.housing;
+  d.housing = housing;
+  d.status = "forfeit";
+  say(d.name + " was registered to the " + previous + ". The chips were moved to a " + housing + ". The fingerprint does not match the new device, so the identity is forfeited. The record remains. The private channel will not open.");
+  render();
+}
+render();
 </script>
 </body>
 </html>
